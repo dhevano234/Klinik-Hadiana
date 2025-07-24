@@ -1,5 +1,5 @@
 <?php
-// File: app/Filament/Dokter/Resources/QueueResource.php - TAMBAH KOLOM KELUHAN
+// File: app/Filament/Dokter/Resources/QueueResource.php - MINIMAL CHANGES: Tambah logic pending
 
 namespace App\Filament\Dokter\Resources;
 
@@ -30,7 +30,7 @@ class QueueResource extends Resource
     {
         return $table
             ->modifyQueryUsing(function (Builder $query) {
-                // ✅ PERUBAHAN UTAMA: Default tampilkan hanya antrian hari ini
+                // ✅ EXISTING: Default tampilkan hanya antrian hari ini
                 return $query->whereDate('tanggal_antrian', today())
                             ->orderBy('created_at', 'desc');
             })
@@ -62,7 +62,7 @@ class QueueResource extends Resource
                     })
                     ->wrap(),
 
-                // ✅ TAMBAH: Kolom Keluhan untuk Dokter
+                // ✅ EXISTING: Kolom Keluhan untuk Dokter
                 Tables\Columns\TextColumn::make('chief_complaint')
                     ->label('Keluhan')
                     ->limit(50)
@@ -85,11 +85,13 @@ class QueueResource extends Resource
                         return '💬 Tidak ada keluhan dari antrian';
                     }),
                     
+                // ✅ MINIMAL CHANGE 1: Tambah pending di status
                 Tables\Columns\TextColumn::make('status')
                     ->label('Status Antrian')
                     ->badge()
                     ->formatStateUsing(fn (string $state): string => match ($state) {
                         'waiting' => 'Menunggu',
+                        'pending' => 'Di-Pending', // ✅ TAMBAH PENDING
                         'serving' => 'Dilayani',
                         'finished' => 'Selesai',
                         'canceled' => 'Dibatalkan',
@@ -97,6 +99,7 @@ class QueueResource extends Resource
                     })
                     ->color(fn (string $state): string => match ($state) {
                         'waiting' => 'warning',
+                        'pending' => 'danger', // ✅ TAMBAH PENDING
                         'serving' => 'success',
                         'finished' => 'primary',
                         'canceled' => 'danger',
@@ -117,10 +120,12 @@ class QueueResource extends Resource
                     ->placeholder('Belum dipanggil'),
             ])
             ->filters([
+                // ✅ MINIMAL CHANGE 2: Tambah pending di filter
                 Tables\Filters\SelectFilter::make('status')
                     ->label('Status')
                     ->options([
                         'waiting' => 'Menunggu',
+                        'pending' => 'Di-Pending', // ✅ TAMBAH PENDING
                         'serving' => 'Dilayani',
                         'finished' => 'Selesai',
                         'canceled' => 'Dibatalkan',
@@ -130,7 +135,7 @@ class QueueResource extends Resource
                     ->label('Layanan')
                     ->relationship('service', 'name'),
                     
-                // ✅ PERUBAHAN: Filter tanggal dibatasi maksimal hari ini
+                // ✅ EXISTING: Filter tanggal dibatasi maksimal hari ini
                 Tables\Filters\Filter::make('tanggal_antrian')
                     ->form([
                         \Filament\Forms\Components\DatePicker::make('tanggal')
@@ -146,7 +151,7 @@ class QueueResource extends Resource
                         );
                     }),
 
-                // ✅ TAMBAH: Filter untuk keluhan
+                // ✅ EXISTING: Filter untuk keluhan
                 Tables\Filters\Filter::make('has_complaint')
                     ->label('Punya Keluhan')
                     ->query(fn ($query) => $query->whereNotNull('chief_complaint')
@@ -160,20 +165,20 @@ class QueueResource extends Resource
                     })),
             ])
             ->actions([
-                // ===== TOMBOL PANGGIL - DIBATASI HARI INI =====
+                // ===== EXISTING: TOMBOL PANGGIL - DIBATASI HARI INI =====
                 Action::make('call')
                     ->label('Panggil')
                     ->icon('heroicon-o-megaphone')
                     ->color('warning')
                     ->size('sm')
                     ->visible(function (Queue $record) {
-                        // ✅ PERUBAHAN UTAMA: Hanya tampilkan untuk antrian hari ini
+                        // ✅ EXISTING: Hanya tampilkan untuk antrian hari ini
                         return $record->status === 'waiting' && 
                                $record->tanggal_antrian->isToday(); // ✅ HANYA HARI INI
                     })
                     ->action(function (Queue $record, $livewire) {
                         try {
-                            // ✅ VALIDASI TAMBAHAN: Pastikan antrian adalah hari ini
+                            // ✅ EXISTING: Validasi tambahan
                             if (!$record->tanggal_antrian->isToday()) {
                                 Notification::make()
                                     ->title('Error')
@@ -216,27 +221,26 @@ class QueueResource extends Resource
                     ->requiresConfirmation()
                     ->modalHeading('Panggil Antrian')
                     ->modalDescription(function (Queue $record) {
-                        // ✅ PERUBAHAN: Tambah info tanggal
+                        // ✅ EXISTING: Info tanggal
                         $tanggal = $record->tanggal_antrian->format('d F Y');
                         return "Apakah Anda yakin ingin memanggil antrian {$record->number} untuk tanggal {$tanggal}?";
                     })
                     ->modalSubmitActionLabel('Ya, Panggil')
                     ->modalCancelActionLabel('Batal'),
 
-                // ✅ PERBAIKAN: TOMBOL REKAM MEDIS dengan info keluhan
+                // ✅ EXISTING: TOMBOL REKAM MEDIS dengan info keluhan
                 Action::make('create_medical_record')
                     ->label('Rekam Medis')
                     ->icon('heroicon-o-document-plus')
                     ->color('success')
                     ->size('sm')
-                    ->visible(fn (Queue $record) => in_array($record->status, ['serving', 'waiting']))
+                    ->visible(fn (Queue $record) => in_array($record->status, ['serving', 'waiting', 'pending'])) // ✅ MINIMAL CHANGE 3: Tambah pending
                     ->action(function (Queue $record) {
-                        // Jika walk-in (tidak ada user_id), redirect ke form kosong
+                        // ✅ EXISTING: Logic sama
                         if (!$record->user_id) {
                             return redirect()->route('filament.dokter.resources.medical-records.create');
                         }
 
-                        // Jika ada user_id, redirect dengan parameter untuk auto-populate
                         return redirect()->route('filament.dokter.resources.medical-records.create', [
                             'user_id' => $record->user_id,
                             'queue_number' => $record->number,
@@ -256,7 +260,7 @@ class QueueResource extends Resource
                         return "Buat rekam medis baru";
                     }),
 
-                // ===== TOMBOL LIHAT KELUHAN (BARU) =====
+                // ===== EXISTING: TOMBOL LIHAT KELUHAN =====
                 Action::make('view_complaint')
                     ->label('Lihat Keluhan')
                     ->icon('heroicon-o-chat-bubble-left-ellipsis')
@@ -276,7 +280,7 @@ class QueueResource extends Resource
                     })
                     ->tooltip('Lihat keluhan lengkap pasien'),
 
-                // ===== TOMBOL SELESAI =====
+                // ===== EXISTING: TOMBOL SELESAI =====
                 Action::make('finish')
                     ->label('Selesai')
                     ->icon('heroicon-o-check')
@@ -304,7 +308,7 @@ class QueueResource extends Resource
                     ->modalHeading('Selesaikan Antrian')
                     ->modalDescription(fn (Queue $record) => "Tandai antrian {$record->number} sebagai selesai?"),
 
-                // ===== TOMBOL LIHAT =====
+                // ===== EXISTING: TOMBOL LIHAT =====
                 Tables\Actions\ViewAction::make()
                     ->label('Lihat')
                     ->size('sm'),

@@ -16,7 +16,12 @@
         <div class="card-header">
             <h5><i class="fas fa-clock" style="color: #f39c12;"></i> Antrian Aktif Anda</h5>
             <div class="status-badge status-{{ strtolower($antrianAktif->status) }}">
-                {{ ucfirst($antrianAktif->status) }}
+                {{-- ✅ CHANGE 1: Badge status untuk pending --}}
+                @if($antrianAktif->status === 'pending')
+                    DI-PENDING
+                @else
+                    {{ ucfirst($antrianAktif->status) }}
+                @endif
             </div>
         </div>
         
@@ -57,6 +62,17 @@
                     </div>
                 </div>
             </div>
+            
+            {{-- ✅ ADD 2: Handle pending card --}}
+            @elseif($antrianAktif->status === 'pending' && $estimasiInfo)
+            <div class="estimasi-card">
+                <div class="estimasi-content">
+                    <div class="estimasi-details">
+                        <p><strong style="color: #e74c3c;">Antrian Anda sedang dijeda</strong></p>
+                    </div>
+                </div>
+            </div>
+            
             @elseif($antrianAktif->status === 'serving')
             <div class="serving-card">
                 <h6><i class="fas fa-user-md" style="color: #27ae60;"></i> Sedang Dilayani</h6>
@@ -70,9 +86,9 @@
         <div class="card-content">
             <i class="fas fa-plus-circle" style="font-size: 3rem; color: #3498db; margin-bottom: 15px;"></i>
             <h5>Belum Ada Antrian Aktif</h5>
-            <p>Buat antrian baru untuk mulai mendapatkan layanan</p>
+            <p>Buat Kunjungan baru untuk mulai mendapatkan layanan</p>
             <a href="/antrian/create" class="btn btn-primary">
-                <i class="fas fa-plus"></i> Buat Antrian
+                <i class="fas fa-plus"></i> Buat Kunjungan
             </a>
         </div>
     </div>
@@ -90,7 +106,7 @@
         </div>
         
         <!-- ✅ NEW: Kuota Dokter Cards (menggantikan total pasien & dokter aktif) -->
-        @if($quotaInfo['has_quotas'])
+        @if(isset($quotaInfo['has_quotas']) && $quotaInfo['has_quotas'])
             @foreach($quotaInfo['quotas']->take(2) as $quota)
             <div class="stat-card quota-card {{ $quota['status_color'] }} animate">
                 <div class="stat-icon {{ $quota['status_color'] }}">
@@ -202,6 +218,12 @@
 .status-serving {
     background: #d4edda;
     color: #155724;
+}
+
+/* ✅ ADD 3: CSS untuk pending badge */
+.status-pending {
+    background: #f8d7da;
+    color: #721c24;
 }
 
 .antrian-content {
@@ -499,3 +521,4 @@
     }
 }
 </style>
+@endsection

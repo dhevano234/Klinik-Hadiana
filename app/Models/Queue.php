@@ -1,5 +1,5 @@
 <?php
-// File: app/Models/Queue.php - UPDATED dengan Session Support
+// File: app/Models/Queue.php - FINAL dengan Status Pending Support
 
 namespace App\Models;
 
@@ -20,7 +20,7 @@ class Queue extends Model
         'tanggal_antrian',
         'chief_complaint',
         'estimated_call_time', // ✅ ESTIMASI WAKTU PANGGILAN
-        'extra_delay_minutes', // ✅ EXTRA DELAY 5 MENIT
+        'extra_delay_minutes', // ✅ EXTRA DELAY 5 MENIT (dual purpose untuk pending)
         'whatsapp_reminder_sent_at',
         'called_at',
         'served_at',
@@ -121,10 +121,12 @@ class Queue extends Model
         return $this->user->gender ?? null;
     }
 
+    // ✅ UPDATED: Status badge dengan pending support
     public function getStatusBadgeAttribute(): string
     {
         return match($this->status) {
             'waiting' => 'warning',
+            'pending' => 'danger',  // ✅ TAMBAHAN BARU
             'serving' => 'info', 
             'finished' => 'success',
             'canceled' => 'danger',
@@ -132,10 +134,12 @@ class Queue extends Model
         };
     }
 
+    // ✅ UPDATED: Status label dengan pending support
     public function getStatusLabelAttribute(): string
     {
         return match($this->status) {
             'waiting' => 'Menunggu',
+            'pending' => 'Di-Pending',  // ✅ TAMBAHAN BARU
             'serving' => 'Sedang Dilayani',
             'finished' => 'Selesai',
             'canceled' => 'Dibatalkan',
@@ -325,13 +329,19 @@ class Queue extends Model
         return $currentTime < $sessionEndTime;
     }
 
-    // ✅ UPDATED: ESTIMASI WAKTU TUNGGU dengan SESSION SUPPORT
+    // ✅ UPDATED: ESTIMASI WAKTU TUNGGU dengan SESSION SUPPORT dan PENDING LOGIC
     
     /**
      * ✅ UPDATED: Get estimasi waktu tunggu berdasarkan session atau tanggal_antrian
+     * ✅ TAMBAH LOGIC: Handle status pending
      */
     public function getEstimasiTungguAttribute(): ?int
     {
+        // ✅ PENDING LOGIC: Jika pending, return waktu tersimpan
+        if ($this->status === 'pending') {
+            return $this->extra_delay_minutes ?? 0;
+        }
+        
         if ($this->status !== 'waiting') {
             return null;
         }
@@ -367,10 +377,16 @@ class Queue extends Model
     }
 
     /**
-     * ✅ Get estimasi waktu panggilan yang sudah diformat
+     * ✅ UPDATED: Get estimasi waktu panggilan yang sudah diformat dengan pending support
      */
     public function getFormattedEstimasiAttribute(): ?string
     {
+        // ✅ PENDING LOGIC: Handle pending state
+        if ($this->status === 'pending') {
+            $savedMinutes = $this->extra_delay_minutes ?? 0;
+            return $savedMinutes > 0 ? "{$savedMinutes} menit (tersimpan)" : "Di-pending";
+        }
+        
         if ($this->status !== 'waiting') {
             return null;
         }
@@ -389,10 +405,15 @@ class Queue extends Model
     }
 
     /**
-     * ✅ Get status delay (on_time, delayed)
+     * ✅ UPDATED: Get status delay dengan pending support
      */
     public function getDelayStatusAttribute(): string
     {
+        // ✅ PENDING LOGIC: Pending state
+        if ($this->status === 'pending') {
+            return 'pending';
+        }
+        
         if ($this->status !== 'waiting') {
             return 'unknown';
         }
@@ -427,10 +448,15 @@ class Queue extends Model
     }
 
     /**
-     * ✅ Get estimasi waktu panggilan dalam format jam
+     * ✅ UPDATED: Get estimasi waktu panggilan dalam format jam dengan pending support
      */
     public function getEstimatedCallTimeFormattedAttribute(): ?string
     {
+        // ✅ PENDING LOGIC: Show dashes for pending
+        if ($this->status === 'pending') {
+            return '--:--';
+        }
+        
         if (!$this->estimated_call_time) {
             // FALLBACK: Hitung estimasi manual
             $estimasiMenit = $this->estimasi_tunggu;
@@ -451,10 +477,15 @@ class Queue extends Model
     }
 
     /**
-     * ✅ Check apakah antrian sudah terlambat dari estimasi
+     * ✅ UPDATED: Check apakah antrian sudah terlambat dari estimasi dengan pending support
      */
     public function getIsOverdueAttribute(): bool
     {
+        // ✅ PENDING LOGIC: Pending queues are not overdue
+        if ($this->status === 'pending') {
+            return false;
+        }
+        
         if ($this->status !== 'waiting') {
             return false;
         }
@@ -476,20 +507,20 @@ class Queue extends Model
         return $this->estimated_call_time < now();
     }
 
-    // ✅ HELPER METHODS
+    // ✅ UPDATED: HELPER METHODS dengan pending support
     public function canEdit(): bool
     {
-        return in_array($this->status, ['waiting']);
+        return in_array($this->status, ['waiting', 'pending']); // ✅ TAMBAH PENDING
     }
 
     public function canCancel(): bool
     {
-        return in_array($this->status, ['waiting']);
+        return in_array($this->status, ['waiting', 'pending']); // ✅ TAMBAH PENDING
     }
 
     public function canPrint(): bool
     {
-        return in_array($this->status, ['waiting', 'serving', 'finished']);
+        return in_array($this->status, ['waiting', 'pending', 'serving', 'finished']); // ✅ TAMBAH PENDING
     }
 
     public function isCompleted(): bool
@@ -499,10 +530,22 @@ class Queue extends Model
 
     public function isActive(): bool
     {
-        return in_array($this->status, ['waiting', 'serving']);
+        return in_array($this->status, ['waiting', 'pending', 'serving']); // ✅ TAMBAH PENDING
     }
 
-    // ✅ SCOPE METHODS - FIXED untuk tanggal_antrian dan session
+    // ✅ UPDATED: Can be pending
+    public function canBePending(): bool
+    {
+        return $this->status === 'waiting';
+    }
+
+    // ✅ NEW: Can be resumed
+    public function canBeResumed(): bool
+    {
+        return $this->status === 'pending';
+    }
+
+    // ✅ SCOPE METHODS - FIXED untuk tanggal_antrian dan session dengan pending support
     public function scopeToday($query)
     {
         return $query->whereDate('tanggal_antrian', today());
@@ -525,9 +568,10 @@ class Queue extends Model
         return $query->where('status', $status);
     }
 
+    // ✅ UPDATED: Active scope include pending
     public function scopeActive($query)
     {
-        return $query->whereIn('status', ['waiting', 'serving']);
+        return $query->whereIn('status', ['waiting', 'pending', 'serving']); // ✅ TAMBAH PENDING
     }
 
     public function scopeCompleted($query)
@@ -549,7 +593,7 @@ class Queue extends Model
         });
     }
 
-    // ✅ SCOPES untuk estimasi waktu
+    // ✅ SCOPES untuk estimasi waktu dengan pending support
     public function scopeOverdue($query)
     {
         return $query->where('status', 'waiting')
@@ -560,6 +604,12 @@ class Queue extends Model
     {
         return $query->where('status', 'waiting')
                     ->where('estimated_call_time', '>=', now());
+    }
+
+    // ✅ NEW: Scope untuk pending queues
+    public function scopePending($query)
+    {
+        return $query->where('status', 'pending');
     }
 
     // ✅ NEW SCOPES untuk tanggal_antrian dan session
