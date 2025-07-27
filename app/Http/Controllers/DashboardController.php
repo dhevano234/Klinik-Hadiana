@@ -82,7 +82,8 @@ class DashboardController extends Controller
     }
 
     /**
-     * ✅ UPDATED: Get quota information untuk hari ini menggunakan WeeklyQuota
+     * ✅ FIXED: Get quota information untuk hari ini menggunakan WeeklyQuota
+     * Mengembalikan format yang sesuai dengan view dashboard
      */
     private function getTodayQuotaInfo()
     {
@@ -97,6 +98,8 @@ class DashboardController extends Controller
         
         if ($quotas->isEmpty()) {
             return [
+                'has_quotas' => false,
+                'quotas' => collect([]),
                 'total_quota' => 0,
                 'used_quota' => 0,
                 'available_quota' => 0,
@@ -107,22 +110,41 @@ class DashboardController extends Controller
             ];
         }
         
-        $totalQuota = $quotas->sum('total_quota');
-        $usedQuota = $quotas->sum(function($quota) use ($today) {
-            return $quota->getUsedQuotaForDate($today);
+        // Transform quotas ke format yang diharapkan view
+        $quotaData = $quotas->map(function($quota) use ($today) {
+            return [
+                'id' => $quota->id,
+                'doctor_name' => $quota->doctorSchedule->doctor_name ?? 'Unknown',
+                'service_name' => $quota->doctorSchedule->service->name ?? 'Unknown',
+                'total_quota' => $quota->total_quota,
+                'used_quota' => $quota->getUsedQuotaForDate($today),
+                'available_quota' => $quota->getAvailableQuotaForDate($today),
+                'usage_percentage' => $quota->getUsagePercentageForDate($today),
+                'status_label' => $quota->getStatusLabelForDate($today),
+                'formatted_quota' => $quota->getFormattedQuotaForDate($today),
+                'is_full' => $quota->isQuotaFullForDate($today),
+                'can_add_queue' => $quota->canAddQueueForDate($today),
+                'time_range' => $quota->doctorSchedule->time_range ?? 'Unknown',
+                'status_color' => $quota->getStatusColorForDate($today),
+            ];
         });
+        
+        $totalQuota = $quotas->sum('total_quota');
+        $usedQuota = $quotaData->sum('used_quota');
         $availableQuota = $totalQuota - $usedQuota;
         $percentageUsed = $totalQuota > 0 ? round(($usedQuota / $totalQuota) * 100, 1) : 0;
         
-        $doctorsAvailable = $quotas->filter(function($quota) use ($today) {
-            return $quota->getAvailableQuotaForDate($today) > 0;
+        $doctorsAvailable = $quotaData->filter(function($quota) {
+            return $quota['available_quota'] > 0;
         })->count();
         
-        $doctorsFull = $quotas->filter(function($quota) use ($today) {
-            return $quota->isQuotaFullForDate($today);
+        $doctorsFull = $quotaData->filter(function($quota) {
+            return $quota['is_full'];
         })->count();
         
         return [
+            'has_quotas' => true,
+            'quotas' => $quotaData,
             'total_quota' => $totalQuota,
             'used_quota' => $usedQuota,
             'available_quota' => $availableQuota,
