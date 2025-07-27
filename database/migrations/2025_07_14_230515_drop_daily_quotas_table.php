@@ -1,5 +1,3 @@
-// File: database/migrations/2025_07_14_150000_drop_daily_quotas_table.php
-
 <?php
 
 use Illuminate\Database\Migrations\Migration;
