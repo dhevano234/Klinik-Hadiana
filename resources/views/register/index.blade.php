@@ -82,6 +82,12 @@
             margin-bottom: 0.3rem;
             font-size: 0.9rem;
         }
+        
+        /* ✅ TANDA WAJIB */
+        .required::after {
+            content: " *";
+            color: #e74c3c;
+        }
 
         .form-control {
             border: 2px solid #e9ecef;
@@ -90,7 +96,7 @@
             font-size: 0.95rem;
             transition: all 0.3s ease;
             background-color: #f8f9fa;
-            margin-bottom: 0.8rem; /* Default margin-bottom for form-control */
+            margin-bottom: 0.8rem;
         }
 
         .form-control:focus {
@@ -112,7 +118,6 @@
 
         .row-compact .form-group {
             flex: 1;
-            /* Hapus position: relative di sini, pindah ke password-input-wrapper */
         }
 
         .gender-options {
@@ -294,39 +299,37 @@
             color: #dc3545;
         }
 
-        /* --- Password Toggle Icon inside input --- */
+        /* Password Toggle Icon inside input */
         .password-input-wrapper {
             position: relative;
             width: 100%;
-            margin-bottom: 0.8rem; /* Pindahkan margin dari input ke wrapper ini */
+            margin-bottom: 0.8rem;
         }
 
         .password-input-wrapper .form-control {
-            padding-right: 2.5rem; /* Tambah padding kanan agar teks tidak tertutup ikon */
-            margin-bottom: 0; /* Hapus margin-bottom dari input, sekarang ditangani oleh wrapper */
+            padding-right: 2.5rem;
+            margin-bottom: 0;
         }
 
         .password-input-wrapper .password-toggle {
             position: absolute;
-            right: 0.75rem; /* Sesuaikan posisi ikon dari kanan input */
+            right: 0.75rem;
             top: 50%;
             transform: translateY(-50%);
             cursor: pointer;
             color: #6c757d;
             font-size: 1.1rem;
-            z-index: 2; /* Pastikan ikon di atas input */
-            padding: 0.25rem; /* Beri sedikit padding agar mudah diklik */
+            z-index: 2;
+            padding: 0.25rem;
         }
+        
         .password-input-wrapper .password-toggle:hover {
             color: #2c3e50;
         }
 
-        /* Sembunyikan ikon mata secara default (saat input kosong) */
         .password-input-wrapper .password-toggle.hidden {
             display: none;
         }
-        /* --- Akhir Password Toggle Icon inside input --- */
-
 
         /* Responsive */
         @media (max-width: 576px) {
@@ -351,9 +354,9 @@
                 flex-direction: column;
                 gap: 0.5rem;
             }
-            /* Sesuaikan posisi ikon mata pada layar mobile jika perlu */
+            
             .password-input-wrapper .password-toggle {
-                right: 1.5rem; /* Mungkin perlu sedikit lebih jauh dari kanan di mobile */
+                right: 1.5rem;
             }
         }
 
@@ -401,7 +404,7 @@
             @csrf
 
             <div class="form-group">
-                <label for="name" class="form-label">Nama Lengkap</label>
+                <label for="name" class="form-label required">Nama Lengkap</label>
                 <input 
                     type="text" 
                     class="form-control @error('name') is-invalid @enderror" 
@@ -419,7 +422,7 @@
 
             <div class="row-compact">
                 <div class="form-group">
-                    <label for="nomor_ktp" class="form-label">Nomor KTP</label>
+                    <label for="nomor_ktp" class="form-label required">Nomor KTP</label>
                     <input 
                         type="text" 
                         class="form-control @error('nomor_ktp') is-invalid @enderror" 
@@ -427,6 +430,8 @@
                         id="nomor_ktp" 
                         placeholder="16 digit KTP" 
                         value="{{ old('nomor_ktp') }}" 
+                        inputmode="numeric"
+                        maxlength="16"
                         required
                     >
                     @error('nomor_ktp')
@@ -435,7 +440,7 @@
                 </div>
                 
                 <div class="form-group">
-                    <label for="email" class="form-label">Email</label>
+                    <label for="email" class="form-label required">Email</label>
                     <input 
                         type="email" 
                         class="form-control @error('email') is-invalid @enderror" 
@@ -453,7 +458,7 @@
 
             <div class="row-compact">
                 <div class="form-group">
-                    <label for="password" class="form-label">Password</label>
+                    <label for="password" class="form-label required">Password</label>
                     <div class="password-input-wrapper">
                         <input 
                             type="password" 
@@ -461,6 +466,7 @@
                             name="password" 
                             id="password" 
                             placeholder="Masukkan password" 
+                            maxlength="16"
                             required
                         >
                         <i class="fas fa-eye password-toggle" id="togglePassword"></i>
@@ -486,7 +492,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="password_confirmation" class="form-label">Konfirmasi Password</label>
+                    <label for="password_confirmation" class="form-label required">Konfirmasi Password</label>
                     <div class="password-input-wrapper">
                         <input 
                             type="password" 
@@ -494,6 +500,7 @@
                             name="password_confirmation" 
                             id="password_confirmation" 
                             placeholder="Ulangi password" 
+                            maxlength="16"
                             required
                         >
                         <i class="fas fa-eye password-toggle" id="toggleConfirmPassword"></i>
@@ -503,14 +510,16 @@
 
             <div class="row-compact">
                 <div class="form-group">
-                    <label for="phone" class="form-label">Nomor HP</label>
+                    <label for="phone" class="form-label required">Nomor HP</label>
                     <input 
                         type="text" 
                         class="form-control @error('phone') is-invalid @enderror" 
                         name="phone" 
                         id="phone" 
                         placeholder="08xxxxxxxxxx" 
-                        value="{{ old('phone') }}" 
+                        value="{{ old('phone') }}"
+                        inputmode="numeric"
+                        maxlength="13"
                         required
                     >
                     @error('phone')
@@ -519,40 +528,52 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="birth_date" class="form-label">Tanggal Lahir</label>
+                    <label for="birth_date" class="form-label required">Tanggal Lahir</label>
                     <input 
                         type="date" 
-                        class="form-control" 
+                        class="form-control @error('birth_date') is-invalid @enderror" 
                         name="birth_date" 
                         id="birth_date" 
                         value="{{ old('birth_date') }}"
+                        required
                     >
+                    @error('birth_date')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
                 </div>
             </div>
 
             <div class="form-group">
-                <label class="form-label">Jenis Kelamin</label>
+                <label class="form-label required">Jenis Kelamin</label>
                 <div class="gender-options">
                     <div class="form-check">
-                        <input class="form-check-input" type="radio" name="gender" id="male" value="Laki-laki" {{ old('gender') == 'Laki-laki' ? 'checked' : '' }}>
+                        <input class="form-check-input" type="radio" name="gender" id="male" value="Laki-laki" {{ old('gender') == 'Laki-laki' ? 'checked' : '' }} required>
                         <label class="form-check-label" for="male">Laki-laki</label>
                     </div>
                     <div class="form-check">
-                        <input class="form-check-input" type="radio" name="gender" id="female" value="Perempuan" {{ old('gender') == 'Perempuan' ? 'checked' : '' }}>
+                        <input class="form-check-input" type="radio" name="gender" id="female" value="Perempuan" {{ old('gender') == 'Perempuan' ? 'checked' : '' }} required>
                         <label class="form-check-label" for="female">Perempuan</label>
                     </div>
                 </div>
+                @error('gender')
+                    <div class="invalid-feedback d-block">{{ $message }}</div>
+                @enderror
             </div>
 
             <div class="form-group">
-                <label for="address" class="form-label">Alamat Lengkap (Opsional)</label>
+                <label for="address" class="form-label required">Alamat Lengkap</label>
                 <textarea 
-                    class="form-control" 
+                    class="form-control @error('address') is-invalid @enderror" 
                     name="address" 
                     id="address" 
                     rows="2" 
-                    placeholder="Masukkan alamat lengkap"
+                    placeholder="Masukkan alamat lengkap (minimal 10 karakter)"
+                    required
+                    minlength="10"
                 >{{ old('address') }}</textarea>
+                @error('address')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
             </div>
 
             <button type="submit" class="btn btn-primary" id="registerBtn">
@@ -577,7 +598,7 @@
         const strengthText = document.getElementById('strengthText');
         const reqLength = document.getElementById('reqLength');
         const reqUppercase = document.getElementById('reqUppercase');
-        const reqLowercase = document.getElementById('reqLowercase'); // Tetap ada untuk update UI
+        const reqLowercase = document.getElementById('reqLowercase');
         const reqNumber = document.getElementById('reqNumber');
         const reqSpecial = document.getElementById('reqSpecial');
         const registerForm = document.getElementById('registerForm');
@@ -585,28 +606,66 @@
         const togglePassword = document.getElementById('togglePassword');
         const toggleConfirmPassword = document.getElementById('toggleConfirmPassword');
         const birthDateInput = document.getElementById('birth_date');
+        const ktpInput = document.getElementById('nomor_ktp');
+        const phoneInput = document.getElementById('phone');
 
-        // ✅ PERBAIKAN UTAMA: Set maximum date for birth date to today
+        // ✅ Set maximum date for birth date to today
         if (birthDateInput) {
             const today = new Date().toISOString().split('T')[0];
             birthDateInput.setAttribute('max', today);
         }
 
-        let isPasswordStrong = false; // Flag untuk status kekuatan password
-        // Jumlah kriteria yang harus dipenuhi untuk 'Sangat Kuat'
-        // Jika sebelumnya 5 (panjang, up, low, num, special), sekarang jadi 4
-        const requiredCriteriaForStrong = 4; 
+        // ✅ VALIDASI KTP & PHONE HANYA ANGKA
+        function setupNumericInput(input) {
+            if (!input) return;
+            
+            input.addEventListener('input', function(e) {
+                // Hapus semua karakter yang bukan angka
+                let value = e.target.value.replace(/[^0-9]/g, '');
+                e.target.value = value;
+            });
+            
+            // Prevent paste non-numeric content
+            input.addEventListener('paste', function(e) {
+                e.preventDefault();
+                let paste = (e.clipboardData || window.clipboardData).getData('text');
+                let numericPaste = paste.replace(/[^0-9]/g, '');
+                e.target.value = numericPaste;
+            });
+
+            // Prevent non-numeric keypress
+            input.addEventListener('keypress', function(e) {
+                // Allow backspace, delete, tab, escape, enter
+                if ([8, 9, 27, 13, 46].indexOf(e.keyCode) !== -1 ||
+                    // Allow Ctrl+A, Ctrl+C, Ctrl+V, Ctrl+X
+                    (e.keyCode === 65 && e.ctrlKey === true) ||
+                    (e.keyCode === 67 && e.ctrlKey === true) ||
+                    (e.keyCode === 86 && e.ctrlKey === true) ||
+                    (e.keyCode === 88 && e.ctrlKey === true)) {
+                    return;
+                }
+                // Ensure that it is a number and stop the keypress
+                if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+                    e.preventDefault();
+                }
+            });
+        }
+
+        setupNumericInput(ktpInput);
+        setupNumericInput(phoneInput);
+
+        let isPasswordStrong = false;
+        const requiredCriteriaForStrong = 4;
 
         passwordInput.addEventListener('input', function() {
             const password = this.value;
-            let score = 0; // Untuk menghitung berapa kriteria yang terpenuhi
+            let score = 0;
 
-            // Show feedback div if password is not empty
             if (password.length > 0) {
                 passwordStrengthFeedback.classList.remove('d-none');
             } else {
                 passwordStrengthFeedback.classList.add('d-none');
-                isPasswordStrong = false; // Reset flag
+                isPasswordStrong = false;
                 updateRegisterButtonState();
                 return;
             }
@@ -614,39 +673,35 @@
             // Check criteria
             const hasLength = password.length >= 8;
             const hasUppercase = /[A-Z]/.test(password);
-            const hasLowercase = /[a-z]/.test(password); // Tetap dicek untuk update UI checklist
+            const hasLowercase = /[a-z]/.test(password);
             const hasNumber = /[0-9]/.test(password);
             const hasSpecial = /[!@#$%^&*()_+{}\[\]:;<>,.?~\\/-]/.test(password);
 
-            // Update checklist UI (semua kriteria akan tetap ditampilkan di checklist)
+            // Update checklist UI
             updateRequirement(reqLength, hasLength);
             updateRequirement(reqUppercase, hasUppercase);
-            updateRequirement(reqLowercase, hasLowercase); // Tetap update UI untuk huruf kecil
+            updateRequirement(reqLowercase, hasLowercase);
             updateRequirement(reqNumber, hasNumber);
             updateRequirement(reqSpecial, hasSpecial);
 
             // Calculate score for actual strength determination
             if (hasLength) score++;
             if (hasUppercase) score++;
-            // if (hasLowercase) score++; // BARIS INI DIHAPUS DARI PERHITUNGAN SCORE
             if (hasNumber) score++;
             if (hasSpecial) score++;
 
-            // Jika ada huruf kecil, itu tetap bisa menambah "nilai" password secara keseluruhan
-            // namun tidak wajib. Jadi, 'score' yang dihitung di atas sekarang adalah kriteria WAJIB.
             let fulfilledRequiredCriteria = score; 
 
             let strength = '';
             let barColorClass = '';
             let textColorClass = '';
 
-            // Tentukan kekuatan berdasarkan kriteria yang TERSISA (4 kriteria wajib)
-            if (fulfilledRequiredCriteria === requiredCriteriaForStrong) { // Semua 4 kriteria wajib terpenuhi
+            if (fulfilledRequiredCriteria === requiredCriteriaForStrong) {
                 strength = 'Sangat Kuat';
                 barColorClass = 'strong';
                 textColorClass = 'strong';
                 isPasswordStrong = true;
-            } else if (fulfilledRequiredCriteria >= (requiredCriteriaForStrong - 1)) { // Misalnya 3 dari 4 kriteria wajib
+            } else if (fulfilledRequiredCriteria >= (requiredCriteriaForStrong - 1)) {
                 strength = 'Cukup Kuat';
                 barColorClass = 'medium';
                 textColorClass = 'medium';
@@ -658,8 +713,6 @@
                 isPasswordStrong = false;
             }
 
-            // Lebar bar dihitung berdasarkan semua kriteria yang dicek UI (5 kriteria)
-            // Ini agar bar tetap menunjukkan progres visual yang lengkap
             let totalCheckedCriteriaForVisual = (hasLength ? 1 : 0) + (hasUppercase ? 1 : 0) + 
                                                (hasLowercase ? 1 : 0) + (hasNumber ? 1 : 0) + 
                                                (hasSpecial ? 1 : 0);
@@ -678,7 +731,6 @@
         }
 
         function updateRegisterButtonState() {
-            // Tombol diaktifkan HANYA jika isPasswordStrong adalah true (semua kriteria wajib terpenuhi)
             if (isPasswordStrong) {
                 registerBtn.disabled = false;
             } else {
@@ -686,14 +738,12 @@
             }
         }
 
-        // --- Fungsi Toggle Password Visibility ---
+        // Toggle password visibility
         function setupPasswordToggle(inputElement, toggleIconElement) {
-            // Initial state: hide icon if input is empty
             if (inputElement.value === '') {
                 toggleIconElement.classList.add('hidden');
             }
 
-            // Toggle visibility on click
             toggleIconElement.addEventListener('click', function () {
                 const type = inputElement.getAttribute('type') === 'password' ? 'text' : 'password';
                 inputElement.setAttribute('type', type);
@@ -701,40 +751,34 @@
                 this.classList.toggle('fa-eye-slash');
             });
 
-            // Show/hide icon based on input content
             inputElement.addEventListener('input', function() {
                 if (this.value === '') {
                     toggleIconElement.classList.add('hidden');
-                    // Reset icon to eye if it was changed to eye-slash and input becomes empty
                     toggleIconElement.classList.remove('fa-eye-slash');
                     toggleIconElement.classList.add('fa-eye');
-                    inputElement.setAttribute('type', 'password'); // Ensure it's hidden when empty
+                    inputElement.setAttribute('type', 'password');
                 } else {
                     toggleIconElement.classList.remove('hidden');
                 }
             });
             
-            // Trigger initial check if field already has value (e.g., from old input)
             if (inputElement.value !== '') {
                 toggleIconElement.classList.remove('hidden');
             }
         }
 
-        // Panggil fungsi untuk password utama
         setupPasswordToggle(passwordInput, togglePassword);
-        // Panggil fungsi untuk konfirmasi password
         setupPasswordToggle(confirmPasswordInput, toggleConfirmPassword);
 
-        // Inisialisasi status tombol saat halaman dimuat (jika ada nilai old('password'))
         if (passwordInput.value.length > 0) {
             passwordInput.dispatchEvent(new Event('input'));
         } else {
             updateRegisterButtonState();
         }
 
-        // Form submission loading
+        // Form submission
         registerForm.addEventListener('submit', function(event) {
-            passwordInput.dispatchEvent(new Event('input')); // Re-run validation
+            passwordInput.dispatchEvent(new Event('input'));
 
             if (passwordInput.value !== confirmPasswordInput.value) {
                 event.preventDefault();
@@ -742,7 +786,7 @@
                 return;
             }
 
-            if (!isPasswordStrong) { // isPasswordStrong sekarang berdasarkan 4 kriteria wajib
+            if (!isPasswordStrong) {
                 event.preventDefault();
                 alert('Password Anda belum cukup kuat. Harap penuhi semua kriteria yang wajib.');
                 return;

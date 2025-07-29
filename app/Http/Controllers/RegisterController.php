@@ -24,18 +24,26 @@ class RegisterController extends Controller
             'nomor_ktp' => 'required|string|size:16|unique:users',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:6|confirmed',
-            'phone' => 'required|string|max:20|unique:users',
-            'birth_date' => 'nullable|date',
-            'gender' => 'nullable|in:Laki-laki,Perempuan',
-            'address' => 'nullable|string',
+            'phone' => 'required|numeric|digits_between:10,15|unique:users',
+            'birth_date' => 'required|date', // ✅ WAJIB DIISI
+            'gender' => 'required|in:Laki-laki,Perempuan',
+            'address' => 'required|string|min:10', // ✅ WAJIB DIISI, MIN 10 KARAKTER
         ], [
             'nomor_ktp.required' => 'Nomor KTP harus diisi',
             'nomor_ktp.size' => 'Nomor KTP harus 16 digit',
             'nomor_ktp.unique' => 'Nomor KTP sudah terdaftar',
             'email.unique' => 'Email sudah terdaftar',
+            'phone.required' => 'Nomor HP harus diisi',
+            'phone.numeric' => 'Nomor HP hanya boleh berisi angka',
+            'phone.digits_between' => 'Nomor HP harus 10-15 digit',
             'phone.unique' => 'Nomor HP sudah terdaftar',
+            'birth_date.required' => 'Tanggal lahir harus diisi',
+            'birth_date.date' => 'Format tanggal lahir tidak valid',
+            'address.required' => 'Alamat harus diisi',
+            'address.min' => 'Alamat minimal 10 karakter',
             'password.min' => 'Password minimal 6 karakter',
             'password.confirmed' => 'Konfirmasi password tidak cocok',
+            'gender.required' => 'Jenis kelamin harus dipilih',
         ]);
 
         if ($validator->fails()) {
@@ -66,22 +74,21 @@ class RegisterController extends Controller
                 'phone' => $request->phone,
                 'birth_date' => $request->birth_date,
                 'gender' => $request->gender,
-                'address' => $request->address ?: 'Alamat belum diisi',
+                'address' => $request->address, // ✅ TIDAK PERLU DEFAULT LAGI KARENA WAJIB
                 'role' => 'user', // Default role untuk registrasi publik
             ]);
 
             DB::commit();
 
             // ✅ Success message dengan nomor RM
-            $successMessage = 'Registrasi berhasil!';
-
+            $successMessage = 'Registrasi berhasil! Nomor Rekam Medis Anda: ' . $user->medical_record_number;
+            
             return redirect()->route('login')->with('success', $successMessage);
 
         } catch (\Exception $e) {
             DB::rollBack();
-            
             return redirect()->back()
-                ->withErrors(['error' => 'Terjadi kesalahan saat registrasi. Silakan coba lagi.'])
+                ->withErrors(['error' => 'Terjadi kesalahan sistem. Silakan coba lagi.'])
                 ->withInput();
         }
     }

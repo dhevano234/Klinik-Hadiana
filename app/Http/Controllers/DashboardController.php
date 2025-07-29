@@ -27,7 +27,9 @@ class DashboardController extends Controller
 
         // ✅ EXISTING: Statistik real untuk cards
         $stats = [
-            'antrian_hari_ini' => Queue::whereDate('tanggal_antrian', $today)->count(),
+            'antrian_hari_ini' => Queue::whereDate('tanggal_antrian', $today)
+            ->whereNotIn('status', ['canceled'])
+            ->count(),
         ];
 
         // ✅ UPDATED: Quota info menggunakan WeeklyQuota

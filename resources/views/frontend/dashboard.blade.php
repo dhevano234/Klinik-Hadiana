@@ -94,8 +94,21 @@
     </div>
     @endif
     
-    <!-- ✅ UPDATED: Stats Row dengan kuota dokter menggantikan total pasien -->
-    <div class="stats-row">
+    <!-- ✅ SMART: Stats Row dengan layout dinamis -->
+    @php
+        $totalCards = 1; // Antrian Hari Ini
+        if(isset($quotaInfo['has_quotas']) && $quotaInfo['has_quotas']) {
+            $totalCards += min($quotaInfo['quotas']->count(), 2); // Max 2 dokter
+            if($quotaInfo['quotas']->count() > 2) {
+                $totalCards += 1; // Card "Lihat Semua"
+            }
+        } else {
+            $totalCards += 2; // 2 placeholder cards
+        }
+        $gridClass = 'stats-' . $totalCards . '-cards';
+    @endphp
+    
+    <div class="stats-row {{ $gridClass }}">
         <!-- Total Antrian Hari Ini (tetap) -->
         <div class="stat-card blue animate">
             <div class="stat-icon blue">
@@ -105,7 +118,7 @@
             <div class="stat-label">Antrian Hari Ini</div>
         </div>
         
-        <!-- ✅ NEW: Kuota Dokter Cards (menggantikan total pasien & dokter aktif) -->
+        <!-- ✅ SMART: Show max 2 doctors, sisanya di "Lihat Semua" -->
         @if(isset($quotaInfo['has_quotas']) && $quotaInfo['has_quotas'])
             @foreach($quotaInfo['quotas']->take(2) as $quota)
             <div class="stat-card quota-card {{ $quota['status_color'] }} animate">
@@ -123,19 +136,23 @@
             </div>
             @endforeach
             
-            <!-- Jika ada lebih dari 2 dokter, tampilkan ringkasan -->
+            <!-- ✅ NEW: Jika lebih dari 2 dokter, tampilkan "Lihat Semua" button -->
             @if($quotaInfo['quotas']->count() > 2)
-            <div class="stat-card summary-card animate">
-                <div class="stat-icon gray">
-                    <i class="fas fa-users"></i>
+            <div class="stat-card view-all-card animate" onclick="showAllDoctors()">
+                <div class="stat-icon info">
+                    <i class="fas fa-eye"></i>
                 </div>
                 <div class="stat-number">+{{ $quotaInfo['quotas']->count() - 2 }}</div>
                 <div class="stat-label">
-                    <div class="doctor-name">Dokter Lainnya</div>
-                    <div class="quota-status">{{ $quotaInfo['quotas']->skip(2)->sum('available_quota') }} tersisa</div>
+                    <div class="doctor-name">Lihat Semua Dokter</div>
+                    <div class="quota-status">{{ $quotaInfo['quotas']->skip(2)->sum('available_quota') }} kuota tersisa</div>
+                </div>
+                <div class="view-all-icon">
+                    <i class="fas fa-arrow-right"></i>
                 </div>
             </div>
             @endif
+            
         @else
             <!-- Fallback jika tidak ada quota hari ini -->
             <div class="stat-card gray animate">
@@ -162,6 +179,40 @@
             </div>
         @endif
     </div>
+
+    <!-- ✅ NEW: Modal untuk menampilkan semua dokter -->
+    @if(isset($quotaInfo['has_quotas']) && $quotaInfo['has_quotas'] && $quotaInfo['quotas']->count() > 2)
+    <div id="doctorsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-user-md"></i> Semua Dokter Hari Ini</h3>
+                <span class="close" onclick="closeDoctorsModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="doctors-grid">
+                    @foreach($quotaInfo['quotas'] as $quota)
+                    <div class="doctor-card {{ $quota['status_color'] }}">
+                        <div class="doctor-avatar {{ $quota['status_color'] }}">
+                            <i class="fas fa-user-md"></i>
+                        </div>
+                        <div class="doctor-info">
+                            <h4>{{ $quota['doctor_name'] }}</h4>
+                            <p>{{ $quota['service_name'] }}</p>
+                            <div class="doctor-quota">
+                                <span class="quota-number">{{ $quota['formatted_quota'] }}</span>
+                                <span class="quota-label">{{ $quota['status_label'] }}</span>
+                            </div>
+                            <div class="doctor-quota-bar">
+                                <div class="doctor-quota-progress" style="width: {{ $quota['usage_percentage'] }}%; background-color: var(--color-{{ $quota['status_color'] }});"></div>
+                            </div>
+                        </div>
+                    </div>
+                    @endforeach
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
 </main>
 
 <style>
@@ -364,12 +415,59 @@
     transform: translateY(-2px);
 }
 
-/* ✅ UPDATED: Stats row dengan quota cards */
+/* ✅ SMART: Dynamic grid based on card count */
 .stats-row {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     gap: 20px;
     margin-bottom: 30px;
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* ✅ Grid untuk 2 cards (1 antrian + 1 dokter) */
+.stats-2-cards {
+    grid-template-columns: repeat(2, 1fr);
+    max-width: 800px; /* Lebih sempit untuk 2 cards */
+}
+
+/* ✅ Grid untuk 3 cards (1 antrian + 2 dokter) */
+.stats-3-cards {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+/* ✅ Grid untuk 4 cards (1 antrian + 2 dokter + lihat semua) */
+.stats-4-cards {
+    grid-template-columns: repeat(2, 1fr);
+}
+
+@media (min-width: 900px) {
+    .stats-4-cards {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+/* ✅ RESPONSIVE: Untuk tablet */
+@media (max-width: 768px) {
+    .stats-row,
+    .stats-2-cards,
+    .stats-3-cards,
+    .stats-4-cards {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+        max-width: 100%;
+    }
+}
+
+/* ✅ RESPONSIVE: Untuk mobile */
+@media (max-width: 480px) {
+    .stats-row,
+    .stats-2-cards,
+    .stats-3-cards,
+    .stats-4-cards {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
 }
 
 .stat-card {
@@ -406,6 +504,19 @@
     border-left: 4px solid var(--color-gray);
 }
 
+/* ✅ NEW: View All Doctors Card */
+.stat-card.view-all-card {
+    cursor: pointer;
+    border-left: 4px solid var(--color-info);
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.stat-card.view-all-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(52, 152, 219, 0.2);
+}
+
 .stat-icon {
     width: 50px;
     height: 50px;
@@ -423,6 +534,7 @@
 .stat-icon.warning { background: var(--color-warning); }
 .stat-icon.danger { background: var(--color-danger); }
 .stat-icon.gray { background: var(--color-gray); }
+.stat-icon.info { background: var(--color-info); }
 
 .stat-number {
     font-size: 1.8rem;
@@ -461,7 +573,194 @@
     transition: width 0.3s ease;
 }
 
-/* ✅ CSS ANIMATIONS */
+.view-all-icon {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    color: var(--color-info);
+    font-size: 16px;
+    transition: transform 0.3s ease;
+}
+
+.stat-card.view-all-card:hover .view-all-icon {
+    transform: translateX(5px);
+}
+
+/* ✅ NEW: Modal Styles */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+    animation: fadeIn 0.3s ease;
+}
+
+.modal-content {
+    background-color: white;
+    margin: 5% auto;
+    padding: 0;
+    border-radius: 15px;
+    width: 90%;
+    max-width: 900px;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    animation: slideInDown 0.3s ease;
+}
+
+.modal-header {
+    padding: 20px 25px;
+    border-bottom: 1px solid #e9ecef;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(135deg, #3498db, #2980b9);
+    color: white;
+    border-radius: 15px 15px 0 0;
+}
+
+.modal-header h3 {
+    margin: 0;
+    font-size: 1.3rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.close {
+    color: white;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    line-height: 1;
+    transition: opacity 0.3s ease;
+}
+
+.close:hover {
+    opacity: 0.7;
+}
+
+.modal-body {
+    padding: 25px;
+}
+
+/* ✅ NEW: Doctors Grid in Modal */
+.doctors-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+}
+
+.doctor-card {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    border-left: 4px solid var(--color-info);
+    box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+    transition: transform 0.2s ease;
+}
+
+.doctor-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+}
+
+.doctor-card.success {
+    border-left-color: var(--color-success);
+}
+
+.doctor-card.warning {
+    border-left-color: var(--color-warning);
+}
+
+.doctor-card.danger {
+    border-left-color: var(--color-danger);
+}
+
+.doctor-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 15px;
+    font-size: 20px;
+    color: white;
+    background: var(--color-info);
+}
+
+.doctor-avatar.success { background: var(--color-success); }
+.doctor-avatar.warning { background: var(--color-warning); }
+.doctor-avatar.danger { background: var(--color-danger); }
+
+.doctor-info h4 {
+    margin: 0 0 5px 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.doctor-info p {
+    margin: 0 0 10px 0;
+    color: #7f8c8d;
+    font-size: 14px;
+}
+
+.doctor-quota {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.quota-number {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #2c3e50;
+}
+
+.quota-label {
+    font-size: 12px;
+    color: #7f8c8d;
+}
+
+.doctor-quota-bar {
+    height: 4px;
+    background: #ecf0f1;
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.doctor-quota-progress {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 0.3s ease;
+}
+
+/* ✅ ANIMATIONS */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideInDown {
+    from { 
+        opacity: 0;
+        transform: translateY(-50px);
+    }
+    to { 
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
 @keyframes fadeInOut {
     0%, 100% { opacity: 0; transform: scale(0.8); }
     15%, 85% { opacity: 1; transform: scale(1); }
@@ -487,7 +786,7 @@
     transition: opacity 0.3s ease;
 }
 
-/* ✅ RESPONSIVE */
+/* ✅ RESPONSIVE untuk modal */
 @media (max-width: 768px) {
     .antrian-content {
         grid-template-columns: 1fr;
@@ -505,9 +804,23 @@
         min-width: 80px;
     }
     
-    .stats-row {
+    .modal-content {
+        width: 95%;
+        margin: 10% auto;
+        max-height: 85vh;
+    }
+    
+    .doctors-grid {
         grid-template-columns: 1fr;
         gap: 15px;
+    }
+    
+    .modal-header {
+        padding: 15px 20px;
+    }
+    
+    .modal-body {
+        padding: 20px;
     }
 }
 
@@ -521,4 +834,32 @@
     }
 }
 </style>
+
+<!-- ✅ NEW: JavaScript untuk Modal -->
+<script>
+function showAllDoctors() {
+    document.getElementById('doctorsModal').style.display = 'block';
+    document.body.style.overflow = 'hidden'; // Prevent background scroll
+}
+
+function closeDoctorsModal() {
+    document.getElementById('doctorsModal').style.display = 'none';
+    document.body.style.overflow = 'auto'; // Restore scroll
+}
+
+// Close modal when clicking outside
+window.onclick = function(event) {
+    const modal = document.getElementById('doctorsModal');
+    if (event.target === modal) {
+        closeDoctorsModal();
+    }
+}
+
+// Close modal with Escape key
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+        closeDoctorsModal();
+    }
+});
+</script>
 @endsection

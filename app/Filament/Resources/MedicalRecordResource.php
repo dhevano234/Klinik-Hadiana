@@ -372,19 +372,6 @@ class MedicalRecordResource extends Resource
                     Tables\Actions\EditAction::make()
                         ->label('Edit')
                         ->icon('heroicon-o-pencil-square'),
-                        
-                    Tables\Actions\Action::make('print')
-                        ->label('Cetak')
-                        ->icon('heroicon-o-printer')
-                        ->color('info')
-                        ->action(function (MedicalRecord $record) {
-                            // ✅ Logic untuk print - bisa dikembangkan nanti
-                            \Filament\Notifications\Notification::make()
-                                ->title('Print Feature')
-                                ->body('Fitur print akan dikembangkan selanjutnya')
-                                ->info()
-                                ->send();
-                        }),
 
                     Tables\Actions\DeleteAction::make()
                         ->label('Hapus')
