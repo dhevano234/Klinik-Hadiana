@@ -1,6 +1,5 @@
 <?php
-// File: database/migrations/2025_06_28_030000_ensure_doctor_id_in_queues_table.php
-// Migration untuk memastikan kolom doctor_id ada dan benar
+
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;

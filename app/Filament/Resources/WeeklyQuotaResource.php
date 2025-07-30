@@ -168,11 +168,11 @@ class WeeklyQuotaResource extends Resource
                     ->color('info')
                     ->sortable(),
 
-                // ✅ FIXED: Tampilkan quota sesuai hari praktik, bukan selalu "hari ini"
+                //  FIXED: Tampilkan quota sesuai hari praktik, bukan selalu "hari ini"
                 Tables\Columns\TextColumn::make('quota_for_practice_day')
                     ->label('Kuota Hari Praktik')
                     ->getStateUsing(function (WeeklyQuota $record) {
-                        // ✅ Hitung untuk hari praktik yang sesuai, bukan selalu hari ini
+                        //  Hitung untuk hari praktik yang sesuai, bukan selalu hari ini
                         $today = today();
                         $practiceDay = $record->day_of_week;
                         $todayDayOfWeek = strtolower($today->format('l'));
@@ -314,7 +314,7 @@ class WeeklyQuotaResource extends Resource
     }
 
     /**
-     * ✅ HELPER: Get next date for specific day of week
+     *  HELPER: Get next date for specific day of week
      */
     public static function getNextDateForDayOfWeek(string $dayOfWeek): Carbon
     {

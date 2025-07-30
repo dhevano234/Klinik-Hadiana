@@ -1,6 +1,5 @@
 <?php
-// File: database/migrations/2025_05_28_190950_create_medical_records_table.php
-// FIXED: Ganti patient_id dengan user_id
+
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -13,7 +12,7 @@ return new class extends Migration
         Schema::create('medical_records', function (Blueprint $table) {
             $table->id();
             
-            // ✅ GANTI: patient_id → user_id dan reference ke users table
+            //  GANTI: patient_id → user_id dan reference ke users table
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
             
             $table->foreignId('doctor_id')->constrained('users')->cascadeOnDelete();

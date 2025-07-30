@@ -1,7 +1,5 @@
 <?php
-// ================================================================
-// LOKASI 1: app/Filament/Dokter/Pages/Dashboard.php
-// ================================================================
+
 
 namespace App\Filament\Dokter\Pages;
 
@@ -12,14 +10,13 @@ class Dashboard extends BaseDashboard
 {
     protected static string $view = 'filament.dokter.pages.dashboard';
     
-    // ✅ UBAH DI SINI: Label yang muncul di Navigation Sidebar
-    protected static ?string $navigationLabel = 'Dasbor'; // ⬅️ UBAH INI ke apapun yang Anda mau
     
-    // ✅ UBAH DI SINI: Title yang muncul di halaman
-    protected static ?string $title = 'Dasbor'; // ⬅️ UBAH INI juga
+    protected static ?string $navigationLabel = 'Dashboard';  
     
-    // ✅ UBAH DI SINI: Icon navigation (opsional)
-    protected static ?string $navigationIcon = 'heroicon-o-home'; // ⬅️ UBAH ICON jika perlu
+    protected static ?string $title = 'Dashboard'; 
+    
+    
+    protected static ?string $navigationIcon = 'heroicon-o-home';  
 
     public function getViewData(): array
     {

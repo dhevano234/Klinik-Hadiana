@@ -1,6 +1,6 @@
 @extends('layouts.main')
 
-@section('title', 'Buku Panduan User')
+@section('title', 'User Guide')
 
 @section('content')
 <main class="main-content">

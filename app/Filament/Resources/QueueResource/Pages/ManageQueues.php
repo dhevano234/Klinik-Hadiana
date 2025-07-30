@@ -1,6 +1,5 @@
 <?php
-// File: app/Filament/Resources/QueueResource/Pages/ManageQueues.php
-// UPDATED: Menggunakan QueueService untuk Global Pending
+
 
 namespace App\Filament\Resources\QueueResource\Pages;
 
@@ -26,7 +25,7 @@ class ManageQueues extends ManageRecords
     protected function getHeaderActions(): array
     {
         return [
-            // ✅ TOMBOL PENDING SEMUA ANTRIAN (dengan auto-activate global pending)
+            
             Actions\Action::make('pendingAllWaiting')
                 ->label('Pending Semua Antrian')
                 ->icon('heroicon-o-pause')
@@ -40,7 +39,7 @@ class ManageQueues extends ManageRecords
                     
                     if ($result['success']) {
                         Notification::make()
-                            ->title('✅ Berhasil Pending Semua Antrian!')
+                            ->title('Berhasil Pending Semua Antrian!')
                             ->body($result['message'] . ' Antrian baru akan otomatis pending.')
                             ->warning()
                             ->duration(8000)
@@ -54,7 +53,7 @@ class ManageQueues extends ManageRecords
                     }
                 }),
 
-            // ✅ TOMBOL RESUME SEMUA ANTRIAN (dengan auto-deactivate global pending)
+            //  TOMBOL RESUME SEMUA ANTRIAN (dengan auto-deactivate global pending)
             Actions\Action::make('resumeAllPending')
                 ->label('Resume Semua Antrian')
                 ->icon('heroicon-o-play')
@@ -68,7 +67,7 @@ class ManageQueues extends ManageRecords
                     
                     if ($result['success']) {
                         Notification::make()
-                            ->title('✅ Berhasil Resume Semua Antrian!')
+                            ->title('Berhasil Resume Semua Antrian!')
                             ->body($result['message'] . ' Antrian baru akan berjalan normal.')
                             ->success()
                             ->duration(8000)

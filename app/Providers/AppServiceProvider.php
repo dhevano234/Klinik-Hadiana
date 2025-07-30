@@ -1,6 +1,5 @@
 <?php
-// File: app/Providers/AppServiceProvider.php
-// Load audio system yang sesuai untuk setiap panel
+
 
 namespace App\Providers;
 

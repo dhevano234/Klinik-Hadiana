@@ -83,7 +83,7 @@
             font-size: 0.9rem;
         }
         
-        /* ✅ TANDA WAJIB */
+        /*  TANDA WAJIB */
         .required::after {
             content: " *";
             color: #e74c3c;
@@ -609,13 +609,13 @@
         const ktpInput = document.getElementById('nomor_ktp');
         const phoneInput = document.getElementById('phone');
 
-        // ✅ Set maximum date for birth date to today
+        
         if (birthDateInput) {
             const today = new Date().toISOString().split('T')[0];
             birthDateInput.setAttribute('max', today);
         }
 
-        // ✅ VALIDASI KTP & PHONE HANYA ANGKA
+        //  VALIDASI KTP & PHONE HANYA ANGKA
         function setupNumericInput(input) {
             if (!input) return;
             

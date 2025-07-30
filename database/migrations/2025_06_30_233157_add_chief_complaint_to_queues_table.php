@@ -1,5 +1,5 @@
 <?php
-// File: database/migrations/2025_06_30_150000_add_chief_complaint_to_queues_table.php
+
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;

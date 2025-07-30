@@ -15,7 +15,7 @@ class ManageCounters extends ManageRecords
             Actions\CreateAction::make()
                 ->label('Tambah Loket')
                 ->icon('heroicon-o-plus')
-                ->createAnother(false), // Disable "Create & Create Another"
+                ->createAnother(false), 
         ];
     }
 }

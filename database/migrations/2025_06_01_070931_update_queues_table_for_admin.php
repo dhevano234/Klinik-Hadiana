@@ -1,6 +1,5 @@
 <?php
-// File: database/migrations/2025_06_01_070931_update_queues_table_for_admin.php
-// FIXED: Ganti patient_id dengan user_id
+
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -11,7 +10,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('queues', function (Blueprint $table) {
-            // ✅ GANTI: patient_id → user_id dan reference ke users
+            //  GANTI: patient_id → user_id dan reference ke users
             if (!Schema::hasColumn('queues', 'user_id')) {
                 $table->foreignId('user_id')->nullable()->after('service_id')->constrained('users')->cascadeOnDelete();
             }
@@ -40,7 +39,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('queues', function (Blueprint $table) {
-            // ✅ GANTI: Hapus user_id bukan patient_id
+            //  GANTI: Hapus user_id bukan patient_id
             $table->dropColumn(['user_id', 'status', 'called_at', 'served_at', 'finished_at', 'canceled_at']);
         });
     }

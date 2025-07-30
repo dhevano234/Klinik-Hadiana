@@ -18,7 +18,7 @@ class Kernel extends ConsoleKernel
 
     protected function schedule(Schedule $schedule): void
     {
-        // ✅ WORKING: WhatsApp reminder setiap menit
+        //  WORKING: WhatsApp reminder setiap menit
         $schedule->command('whatsapp:send-reminders')
                  ->everyMinute()
                  ->between('00:00', '23:59') // Testing: allow all hours
@@ -32,7 +32,7 @@ class Kernel extends ConsoleKernel
                      \Illuminate\Support\Facades\Log::error('WhatsApp reminders check failed');
                  });
 
-        // ✅ WORKING: Update overdue queues setiap 5 menit
+        //  WORKING: Update overdue queues setiap 5 menit
         $schedule->command('queue:update-overdue')
                  ->everyFiveMinutes()
                  ->between('00:00', '23:59') // Testing: allow all hours

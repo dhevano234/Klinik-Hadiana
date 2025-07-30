@@ -1,7 +1,5 @@
 <?php
-// =================================================================
-// File: app/Filament/Resources/MedicalRecordResource/Pages/EditMedicalRecord.php
-// =================================================================
+
 
 namespace App\Filament\Resources\MedicalRecordResource\Pages;
 

@@ -5,8 +5,8 @@
 @section('content')
 <main class="main-content">
     <div class="page-header animate">
-        <h1><i class="fas fa-plus-circle"></i> Buat Antrian</h1>
-        <p>Isi form berikut untuk membuat antrian baru</p>
+        <h1><i class="fas fa-plus-circle"></i> Buat Kunjungan</h1>
+        <p>Isi form berikut untuk membuat kunjungan</p>
     </div>
 
     {{-- Alert untuk error --}}
@@ -25,7 +25,7 @@
         </div>
     @endif
 
-    {{-- Alert untuk success --}}
+    
     @if (session('success'))
         <div class="alert alert-success animate">
             <i class="fas fa-check-circle"></i>
@@ -40,14 +40,12 @@
         <form action="{{ route('antrian.store') }}" method="POST" id="antrianForm">
             @csrf
             
-            {{-- SECTION 1: Informasi Personal --}}
+            {{-- datadiri --}}
             <div class="form-section">
                 <h6 class="form-section-title">
                     <i class="fas fa-user"></i>
                     Informasi Personal
-                    <small style="color: #7f8c8d; font-weight: normal; font-size: 0.85rem;">
-                        (Data diambil dari profil Anda)
-                    </small>
+                    
                 </h6>
                 
                 <div class="form-grid">
@@ -98,7 +96,7 @@
                 </div>
             </div>
 
-            {{-- SECTION 2: Informasi Layanan --}}
+            {{-- Layanan --}}
             <div class="form-section">
                 <h6 class="form-section-title">
                     <i class="fas fa-stethoscope"></i>
@@ -136,7 +134,7 @@
                         @enderror
                     </div>
 
-                    {{-- ✅ FIXED: Dokter dropdown dengan event handling yang diperbaiki --}}
+                    
                     <div class="form-group">
                         <label for="doctor_id" class="form-label">Dokter <span class="required">*</span></label>
                         <div class="custom-dropdown" data-name="doctor_id">
@@ -150,7 +148,7 @@
                                     <i class="fas fa-search search-icon"></i>
                                 </div>
                                 <div class="dropdown-options" id="doctor-options">
-                                    {{-- Options akan diisi via JavaScript berdasarkan tanggal yang dipilih --}}
+                                    
                                 </div>
                             </div>
                             <input type="hidden" name="doctor_id" id="doctor_id" value="{{ old('doctor_id') }}" required>
@@ -174,7 +172,7 @@
                 </div>
             </div>
 
-            {{-- SECTION 3: Keluhan Utama (OPSIONAL) --}}
+            {{-- keluhan --}}
             <div class="form-section">
                 <h6 class="form-section-title">
                     <i class="fas fa-comment-medical"></i>
@@ -183,44 +181,17 @@
                 
                 <div class="form-grid">
                     <div class="form-group full-width">
-                        <label for="chief_complaint" class="form-label">
-                            Keluhan/Gejala yang Dialami 
-                            <span class="optional">(Opsional)</span>
-                        </label>
                         <textarea name="chief_complaint" 
                                   id="chief_complaint" 
                                   class="form-textarea @error('chief_complaint') is-invalid @enderror"
                                   rows="4"
                                   maxlength="1000"
-                                  placeholder="Contoh: Demam sejak 2 hari, sakit kepala, batuk berdahak, nyeri perut, dll.&#10;&#10;Jika diisi, keluhan ini akan otomatis muncul saat dokter membuat rekam medis Anda.">{{ old('chief_complaint') }}</textarea>
-                        
-                        <div class="form-helper">
-                            <i class="fas fa-info-circle"></i>
-                            <span>
-                                <strong>Opsional:</strong> Anda boleh mengosongkan field ini. 
-                                Jika diisi, keluhan akan otomatis muncul di rekam medis dokter.
-                            </span>
-                        </div>
-                        
-                        {{-- Character counter --}}
-                        <div class="character-counter">
-                            <small class="text-muted">
-                                <span id="char-count">0</span>/1000 karakter
-                            </small>
-                        </div>
-                        
-                        @error('chief_complaint')
-                            <div class="form-error">{{ $message }}</div>
-                        @enderror
-                    </div>
-                </div>
-            </div>
+                                  placeholder="Contoh: Demam sejak 2 hari, sakit kepala, batuk berdahak, nyeri perut, dll">{{ old('chief_complaint') }}</textarea>
 
-            {{-- Form Actions --}}
             <div class="form-actions">
                 <button type="submit" class="btn btn-primary btn-lg" id="submitBtn">
                     <i class="fas fa-plus-circle"></i>
-                    Buat Antrian
+                    Buat Kunjungan
                 </button>
                 <a href="/antrian" class="btn btn-secondary">
                     <i class="fas fa-arrow-left"></i>
@@ -232,7 +203,7 @@
 </main>
 
 <style>
-/* ✅ UPDATED: Simplified Doctor option styles */
+
 .doctor-session-option {
     padding: 15px;
     border-bottom: 1px solid #ecf0f1;
@@ -355,7 +326,7 @@
     margin: 0;
 }
 
-/* Alert Styles */
+
 .alert {
     background: white;
     border: none;
@@ -394,7 +365,7 @@
     color: #7f8c8d;
 }
 
-/* Form Styles */
+
 .form-card {
     background: white;
     border-radius: 15px;
@@ -437,7 +408,7 @@
     flex-direction: column;
 }
 
-/* Full width form group */
+
 .form-group.full-width {
     grid-column: 1 / -1;
 }
@@ -487,7 +458,7 @@
     pointer-events: none;
 }
 
-/* Form textarea styling */
+
 .form-textarea {
     padding: 12px 15px;
     border: 2px solid #ecf0f1;
@@ -549,11 +520,6 @@
     text-decoration: underline;
 }
 
-/* Character counter */
-.character-counter {
-    text-align: right;
-    margin-top: 5px;
-}
 
 .character-counter small {
     font-size: 11px;
@@ -574,7 +540,7 @@
     font-size: 16px;
 }
 
-/* Date Picker Styles */
+
 .tanggal-antrian-picker {
     display: flex !important;
     flex-wrap: wrap;
@@ -938,7 +904,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const doctorDropdown = document.querySelector('[data-name="doctor_id"]');
     const doctorOptions = document.getElementById('doctor-options');
     
-    // ✅ CORE FIX: Dedicated doctor option click handler
+    
     function handleDoctorOptionClick(e) {
         e.preventDefault();
         e.stopPropagation();
@@ -950,24 +916,24 @@ document.addEventListener('DOMContentLoaded', function() {
         // Select doctor
         selectDoctorSession(this, sessionInfo);
         
-        // ✅ CRITICAL: Force close dropdown
+        
         forceCloseDropdown(doctorDropdown);
     }
     
-    // ✅ CORE FIX: Manual event attachment after AJAX
+    
     function attachDoctorClickListeners() {
         const doctorSessionOptions = doctorOptions.querySelectorAll('.doctor-session-option:not(.unavailable)');
         
         console.log('Attached listeners to', doctorSessionOptions.length, 'options');
         
         doctorSessionOptions.forEach(option => {
-            // ✅ Prevent double binding
+            
             option.removeEventListener('click', handleDoctorOptionClick);
             option.addEventListener('click', handleDoctorOptionClick);
         });
     }
     
-    // ✅ CORE FIX: Aggressive force close function
+    
     function forceCloseDropdown(dropdown) {
         if (!dropdown) return;
         
@@ -996,7 +962,7 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('Dropdown force closed');
     }
     
-    // ✅ FIXED: Update doctor sessions dengan quota check
+    
     function updateDoctorSessions(selectedDate) {
         if (!selectedDate) return;
         
@@ -1042,7 +1008,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // ✅ FIXED: Simplified dropdown options dengan manual event attach
+    
     function updateDoctorDropdownOptions(sessions, selectedDate) {
         if (!doctorOptions) return;
         
@@ -1092,21 +1058,21 @@ document.addEventListener('DOMContentLoaded', function() {
         
         doctorOptions.innerHTML = optionsHTML;
         
-        // ✅ CRITICAL: Manual attach event listeners
+        
         attachDoctorClickListeners();
     }
     
-    // ✅ FIXED: Select doctor session (simplified - no session info display)
+    
     function selectDoctorSession(optionElement, sessionInfo) {
         const hiddenInput = doctorDropdown.querySelector('input[type="hidden"]');
         const dropdownText = doctorDropdown.querySelector('.dropdown-text');
         
-        // Update hidden input dan display
+        
         hiddenInput.value = sessionInfo.id;
         dropdownText.textContent = sessionInfo.doctor_name;
         dropdownText.classList.remove('placeholder');
         
-        // Update selected state
+        
         doctorOptions.querySelectorAll('.dropdown-option').forEach(opt => {
             opt.classList.remove('selected');
         });
@@ -1115,9 +1081,9 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('Doctor selected:', sessionInfo.doctor_name);
     }
     
-    // ✅ REMOVED: showSessionInfo function - tidak perlu lagi
     
-    // ✅ FIXED: Reset doctor selection (simplified)
+    
+    
     function resetDoctorSelection() {
         const hiddenInput = doctorDropdown.querySelector('input[type="hidden"]');
         const dropdownText = doctorDropdown.querySelector('.dropdown-text');
@@ -1131,7 +1097,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // ✅ FIXED: Close dropdown function (untuk service dropdown)
+    
     function closeDropdown(dropdown) {
         if (!dropdown) return;
         
@@ -1139,16 +1105,16 @@ document.addEventListener('DOMContentLoaded', function() {
         const menu = dropdown.querySelector('.dropdown-menu');
         const backdrop = document.querySelector('.dropdown-backdrop');
         
-        // Remove active states
+        
         trigger.classList.remove('active');
         menu.classList.remove('show');
         
-        // Hide backdrop
+        
         if (backdrop) {
             backdrop.classList.remove('show');
         }
         
-        // Clear search if exists
+        
         const searchInput = dropdown.querySelector('.search-input');
         if (searchInput) {
             searchInput.value = '';
@@ -1158,22 +1124,22 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // ✅ Close all dropdowns
+    // close dropdown
     function closeAllDropdowns() {
         const dropdowns = document.querySelectorAll('.custom-dropdown');
         dropdowns.forEach(dropdown => {
             const dropdownName = dropdown.getAttribute('data-name');
             if (dropdownName === 'doctor_id') {
-                // Use force close for doctor dropdown
+                
                 forceCloseDropdown(dropdown);
             } else {
-                // Use normal close for other dropdowns
+                
                 closeDropdown(dropdown);
             }
         });
     }
     
-    // ✅ FIXED: Date change handler
+    
     function initDateChangeHandler() {
         const tanggalAntrianPicker = document.getElementById('tanggal-antrian-picker');
         const hiddenTanggalInput = document.getElementById('tanggal');
@@ -1183,13 +1149,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 const dateOption = e.target.closest('.date-option');
                 if (!dateOption) return;
                 
-                // Update selected state
+                
                 this.querySelectorAll('.date-option').forEach(option => {
                     option.classList.remove('selected');
                 });
                 dateOption.classList.add('selected');
                 
-                // Update hidden input
+                
                 const selectedDate = dateOption.getAttribute('data-date');
                 if (hiddenTanggalInput) {
                     hiddenTanggalInput.value = selectedDate;
@@ -1197,7 +1163,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 console.log('Date changed to:', selectedDate);
                 
-                // Reset doctor selection and update sessions
+                
                 resetDoctorSelection();
                 updateDoctorSessions(selectedDate);
             });
@@ -1208,7 +1174,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const selectedDate = this.value;
                 console.log('Hidden input date changed to:', selectedDate);
                 
-                // Update visual picker
+                
                 if (tanggalAntrianPicker) {
                     tanggalAntrianPicker.querySelectorAll('.date-option').forEach(option => {
                         option.classList.remove('selected');
@@ -1220,27 +1186,27 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                 }
                 
-                // Reset doctor dan update sessions
+                
                 resetDoctorSelection();
                 updateDoctorSessions(selectedDate);
             });
         }
     }
 
-    // Initialize form
+    
     const form = document.getElementById('antrianForm');
     const submitBtn = document.getElementById('submitBtn');
 
-    // ✅ FIXED: Initialize Custom Dropdowns (service dropdown menggunakan static handling)
+    
     initCustomDropdowns();
 
-    // Initialize character counter for chief_complaint
+    
     initCharacterCounter();
     
-    // Initialize date change handler
+    // update tanggal
     initDateChangeHandler();
 
-    // Form validation and submission
+    
     if (form) {
         form.addEventListener('submit', function(e) {
             // Validasi service_id wajib diisi
@@ -1268,18 +1234,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
 
-            // Validasi chief_complaint length
-            const chiefComplaintTextarea = document.getElementById('chief_complaint');
-            const chiefComplaint = chiefComplaintTextarea?.value?.trim();
-            
-            if (chiefComplaint && chiefComplaint.length > 1000) {
-                e.preventDefault();
-                alert('Keluhan terlalu panjang! Maksimal 1000 karakter.');
-                chiefComplaintTextarea.focus();
-                return false;
-            }
 
-            // Disable submit button untuk prevent double submission
+            
             if (submitBtn) {
                 submitBtn.disabled = true;
                 submitBtn.classList.add('btn-loading');
@@ -1288,7 +1244,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Close alert functionality
+    
     document.querySelectorAll('.alert-close').forEach(button => {
         button.addEventListener('click', function() {
             this.parentElement.style.display = 'none';
@@ -1322,7 +1278,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // ✅ FIXED: Custom dropdown initialization dengan pemisahan sistem
+    
     function initCustomDropdowns() {
         const dropdowns = document.querySelectorAll('.custom-dropdown');
         let backdrop = null;
@@ -1336,14 +1292,14 @@ document.addEventListener('DOMContentLoaded', function() {
             const searchInput = dropdown.querySelector('.search-input');
             const dropdownText = dropdown.querySelector('.dropdown-text');
 
-            // Create backdrop for mobile
+            
             if (!backdrop) {
                 backdrop = document.createElement('div');
                 backdrop.className = 'dropdown-backdrop';
                 document.body.appendChild(backdrop);
             }
 
-            // Set initial state
+            
             const currentValue = hiddenInput.value;
             if (currentValue) {
                 const selectedOption = dropdown.querySelector(`[data-value="${currentValue}"]`);
@@ -1352,7 +1308,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
 
-            // ✅ FIXED: Trigger click dengan prevent double binding
+            
             trigger.removeEventListener('click', handleTriggerClick);
             trigger.addEventListener('click', handleTriggerClick);
             
@@ -1360,19 +1316,19 @@ document.addEventListener('DOMContentLoaded', function() {
                 e.preventDefault();
                 e.stopPropagation();
                 
-                // Close other dropdowns
+                
                 closeAllDropdowns();
                 
-                // Toggle current dropdown
+               
                 const isOpen = menu.classList.contains('show');
                 if (!isOpen) {
                     openDropdown(dropdown);
                 }
             }
 
-            // ✅ FIXED: Pisahkan event handling berdasarkan dropdown type
+            
             if (dropdownName === 'service_id') {
-                // Service dropdown: Static options, normal event handling
+                
                 options.forEach(option => {
                     if (!option.classList.contains('disabled')) {
                         option.addEventListener('click', function(e) {
@@ -1421,12 +1377,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
 
-        // Close dropdowns on escape
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                closeAllDropdowns();
-            }
-        });
 
         function openDropdown(dropdown) {
             const trigger = dropdown.querySelector('.dropdown-trigger');

@@ -69,10 +69,10 @@ class DoctorManagementResource extends Resource
                                     ->hint('Password harus memenuhi kriteria:')
                                     ->hintIcon('heroicon-o-information-circle')
                                     ->helperText('
-                                        ✅ Minimal 8 karakter
-                                        ✅ Huruf kapital (A-Z)  
-                                        ✅ Angka (0-9)
-                                        ✅ Karakter spesial (!@#$%^&*_)
+                                         Minimal 8 karakter
+                                         Huruf kapital (A-Z)  
+                                         Angka (0-9)
+                                         Karakter spesial (!@#$%^&*_)
                                         
                                         💡 Kosongkan jika tidak ingin mengubah password
                                     ')

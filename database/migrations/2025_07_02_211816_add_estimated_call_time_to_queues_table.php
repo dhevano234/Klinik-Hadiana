@@ -1,5 +1,5 @@
 <?php
-// File: database/migrations/2025_07_02_add_estimated_call_time_to_queues_table.php
+
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;

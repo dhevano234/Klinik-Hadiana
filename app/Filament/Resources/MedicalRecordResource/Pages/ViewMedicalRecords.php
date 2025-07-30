@@ -1,8 +1,5 @@
 <?php
-// =================================================================
-// File: app/Filament/Resources/MedicalRecordResource/Pages/ViewMedicalRecord.php
-// Admin Panel - View Medical Record (Mengikuti style dokter)
-// =================================================================
+
 
 namespace App\Filament\Resources\MedicalRecordResource\Pages;
 

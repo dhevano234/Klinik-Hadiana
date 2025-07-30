@@ -28,7 +28,7 @@ class ManageDoctorSchedules extends ManageRecords
     protected function getHeaderWidgets(): array
     {
         return [
-            // Bisa ditambahkan widget statistik nanti
+            
         ];
     }
 }

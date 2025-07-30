@@ -1,5 +1,5 @@
 <?php
-// app/Http/Middleware/EnsureDokterRole.php
+
 
 namespace App\Http\Middleware;
 

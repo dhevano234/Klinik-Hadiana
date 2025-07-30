@@ -1,4 +1,4 @@
-{{-- File: resources/views/filament/tables/columns/quota-progress.blade.php --}}
+
 
 <div class="w-full max-w-xs">
     @php

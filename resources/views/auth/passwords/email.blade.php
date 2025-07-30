@@ -1,4 +1,3 @@
-<!-- resources/views/auth/passwords/email.blade.php -->
 <!DOCTYPE html>
 <html lang="en">
 <head>

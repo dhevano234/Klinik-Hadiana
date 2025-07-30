@@ -62,18 +62,18 @@
                         <div class="detail-row">
                             <span><i class="fas fa-id-card"></i> {{ $antrianTerbaru->user->nomor_ktp ?? 'Belum diisi' }}</span>
                         </div>
-                        {{-- ✅ TAMBAHAN: Informasi Nomor Rekam Medis --}}
+                        
                         <div class="detail-row">
                             <span><i class="fas fa-file-medical"></i> No. RM: {{ $antrianTerbaru->user->medical_record_number ?? 'Belum ada' }}</span>
                         </div>
-                        {{-- ✅ TAMBAHAN: Tanggal Antrian dengan styling konsisten --}}
+                        
                         <div class="detail-row tanggal-antrian-highlight">
                             <span class="tanggal-antrian-info">
                                 <i class="fas fa-calendar-day"></i> 
                                 <strong>Tanggal Antrian: {{ $antrianTerbaru->tanggal_antrian ? $antrianTerbaru->tanggal_antrian->format('d F Y') : 'Tidak diketahui' }}</strong>
                             </span>
                         </div>
-                        {{-- ✅ TAMBAHAN: Nama Dokter di bagian kiri --}}
+                        
                         @if(isset($antrianTerbaru->doctor_name) || isset($antrianTerbaru->doctor->name))
                         <div class="detail-row">
                             <span class="doctor-info-left">
@@ -93,7 +93,7 @@
                         <small>Layanan Klinik</small>
                     </div>
                     
-                    {{-- ✅ PERBAIKAN WAKTU: Tambahkan jam ambil antrian --}}
+                    
                     <div class="time-info">
                         <div class="date-info">
                             <small><i class="fas fa-calendar"></i> Tanggal Input: {{ $antrianTerbaru->created_at->setTimezone('Asia/Jakarta')->format('d F Y') }}</small>
@@ -123,14 +123,7 @@
                 </div>
             </div>
             
-            <div class="antrian-actions">
-                @if($antrianTerbaru->canEdit())
-                    <a href="{{ route('antrian.edit', $antrianTerbaru->id) }}" 
-                       class="btn btn-warning btn-sm" 
-                       title="Edit Antrian">
-                        <i class="fas fa-edit"></i> Edit
-                    </a>
-                @endif
+            
                 
                 @if($antrianTerbaru->canPrint())
                 <a href="{{ route('antrian.print', $antrianTerbaru->id) }}" 
@@ -306,7 +299,7 @@
     flex-shrink: 0;
 }
 
-/* ✅ TAMBAHAN: Styling khusus untuk tanggal antrian */
+
 .tanggal-antrian-highlight {
     margin-top: 8px !important;
     margin-bottom: 8px !important;
@@ -351,7 +344,7 @@
     margin-top: 5px;
 }
 
-/* ✅ PERBAIKAN: Styling untuk informasi waktu yang lebih baik */
+/*  PERBAIKAN: Styling untuk informasi waktu yang lebih baik */
 .time-info {
     background: #f8f9fa;
     padding: 10px;
@@ -360,7 +353,7 @@
     margin: 5px 0;
 }
 
-/* ✅ TAMBAHAN: Styling khusus untuk tanggal antrian */
+/*  TAMBAHAN: Styling khusus untuk tanggal antrian */
 .tanggal-antrian-highlight {
     margin-top: 8px !important;
     margin-bottom: 8px !important;
@@ -391,7 +384,7 @@
     color: #1976d2;
 }
 
-/* ✅ TAMBAHAN: Styling untuk nama dokter di bagian kiri */
+/*  TAMBAHAN: Styling untuk nama dokter di bagian kiri */
 .doctor-info-left {
     background: linear-gradient(135deg, #e8f5e8 0%, #f1f8e9 100%) !important;
     color: #2e7d32 !important;
@@ -553,7 +546,7 @@
         margin: 10px 0;
     }
 
-    /* ✅ Responsive untuk tanggal antrian */
+    /*  Responsive untuk tanggal antrian */
     .tanggal-antrian-info {
         flex-direction: column !important;
         align-items: flex-start !important;
@@ -564,7 +557,7 @@
         text-align: left;
     }
 
-    /* ✅ Responsive untuk tanggal antrian dan dokter */
+    /*  Responsive untuk tanggal antrian dan dokter */
     .tanggal-antrian-info,
     .doctor-info-left {
         flex-direction: column !important;
@@ -589,7 +582,7 @@
 .animate:nth-child(2) { animation-delay: 0.2s; }
 .animate:nth-child(3) { animation-delay: 0.3s; }
 
-/* ✅ TAMBAHAN: Animasi hover untuk elemen interaktif */
+/*  TAMBAHAN: Animasi hover untuk elemen interaktif */
 .tanggal-antrian-info:hover {
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(33, 150, 243, 0.25) !important;

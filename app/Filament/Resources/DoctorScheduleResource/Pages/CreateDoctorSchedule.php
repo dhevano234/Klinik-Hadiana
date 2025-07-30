@@ -1,6 +1,5 @@
 <?php
-// File: app/Filament/Resources/DoctorScheduleResource/Pages/CreateDoctorSchedule.php
-// UPDATED: Dropdown dokter dari database users
+
 
 namespace App\Filament\Resources\DoctorScheduleResource\Pages;
 
@@ -34,7 +33,7 @@ class CreateDoctorSchedule extends CreateRecord
 
     protected function mutateFormDataBeforeCreate(array $data): array
     {
-        // ✅ VALIDASI: Pastikan doctor_id adalah role 'dokter'
+        
         if (isset($data['doctor_id'])) {
             $doctor = User::find($data['doctor_id']);
             if (!$doctor || $doctor->role !== 'dokter') {

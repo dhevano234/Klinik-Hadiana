@@ -6,7 +6,7 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 use App\Services\QueueService;
 use App\Models\Queue;
-use Illuminate\Support\Facades\Log; // ✅ TAMBAH INI - Import Log facade
+use Illuminate\Support\Facades\Log; //  TAMBAH INI - Import Log facade
 
 class UpdateQueueEstimations extends Command
 {
@@ -52,7 +52,7 @@ class UpdateQueueEstimations extends Command
             ->get();
 
         if ($overdueQueues->isEmpty()) {
-            $this->info('✅ No overdue queues found');
+            $this->info(' No overdue queues found');
             return 0;
         }
 
@@ -88,7 +88,7 @@ class UpdateQueueEstimations extends Command
             }
         }
 
-        // Display results table
+        
         $this->table([
             'Queue #',
             'Service',
@@ -101,18 +101,18 @@ class UpdateQueueEstimations extends Command
         ], $table);
 
         if ($isDryRun) {
-            $this->warn("🧪 DRY RUN: Would update {$overdueQueues->count()} queues");
+            $this->warn(" DRY RUN: Would update {$overdueQueues->count()} queues");
         } else {
-            $this->info("✅ Successfully updated {$updatedCount} queue estimations");
+            $this->info(" Successfully updated {$updatedCount} queue estimations");
             
-            // ✅ OPTION 1: Dengan Log facade (sudah diimport)
+            
             $this->logActivity($updatedCount);
         }
 
         return 0;
     }
 
-    // ✅ OPTION 1: Menggunakan Log facade
+    //  OPTION 1: Menggunakan Log facade
     private function logActivity(int $updatedCount)
     {
         Log::info('Queue estimations updated', [

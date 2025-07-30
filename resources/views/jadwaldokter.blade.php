@@ -1,5 +1,4 @@
-{{-- File: resources/views/jadwaldokter.blade.php --}}
-{{-- SIMPLE VERSION: Same design, simplified logic --}}
+
 
 @extends('layouts.main')
 
@@ -33,13 +32,13 @@
                         </div>
                     @endif
                     
-                    <!-- ✅ SIMPLE Status Badge -->
+                    <!--   Status Badge -->
                     @php
                         $today = strtolower(now()->format('l')); // monday, tuesday, etc.
                         $currentTime = now()->format('H:i');
                         $isPracticingToday = in_array($today, $doctor['all_days']->toArray());
                         
-                        // Simple status logic
+                        //  status logic
                         if (!$isPracticingToday) {
                             $status = 'not_today';
                             $label = 'Tidak Praktik';
@@ -110,7 +109,7 @@
                         </div>
                     </div>
 
-                    <!-- ✅ SIMPLE Status Info -->
+                    <!--   Status Info -->
                     <div class="doctor-status-info">
                         @if($status === 'practicing')
                             <div class="status-info-active">
@@ -168,7 +167,7 @@
 </main>
 
 <style>
-/* Same design as before, but simplified status classes */
+
 .page-header {
     background: white;
     padding: 25px;
@@ -189,7 +188,7 @@
     margin: 0;
 }
 
-/* Doctor Cards Grid */
+
 .doctors-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
@@ -211,7 +210,7 @@
     box-shadow: 0 20px 40px rgba(0,0,0,0.15);
 }
 
-/* Doctor Photo Section */
+
 .doctor-photo {
     position: relative;
     height: 200px;
@@ -248,7 +247,7 @@
     opacity: 0.8;
 }
 
-/* ✅ SIMPLE Status Badge */
+
 .status-badge {
     position: absolute;
     top: 15px;
@@ -288,7 +287,7 @@
     100% { box-shadow: 0 0 0 0 rgba(46, 204, 113, 0); }
 }
 
-/* Doctor Info Section */
+
 .doctor-info {
     padding: 25px;
 }
@@ -364,7 +363,7 @@
     font-size: 15px;
 }
 
-/* ✅ SIMPLE Status Info */
+
 .doctor-status-info {
     margin-top: 20px;
     text-align: center;
@@ -422,7 +421,7 @@
     font-weight: 500;
 }
 
-/* Info Section */
+
 .info-section {
     margin-top: 40px;
 }

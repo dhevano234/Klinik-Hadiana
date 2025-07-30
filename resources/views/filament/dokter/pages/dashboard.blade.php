@@ -43,11 +43,11 @@
         </div>
     </div>
 
-    {{-- ✅ UPDATED: Jadwal Dokter Hari Ini berdasarkan user yang login --}}
+    {{--  UPDATED: Jadwal Dokter Hari Ini berdasarkan user yang login --}}
     @php
         $today = strtolower(now()->format('l')); // monday, tuesday, etc.
         
-        // ✅ METODE 1: Cari berdasarkan doctor_id (jika kolom ada)
+        //  METODE 1: Cari berdasarkan doctor_id (jika kolom ada)
         $mySchedule = \App\Models\DoctorSchedule::where('doctor_id', $user->id)
             ->where('is_active', true)
             ->where(function($query) use ($today) {
@@ -56,7 +56,7 @@
             ->with('service')
             ->first();
         
-        // ✅ METODE 2: Fallback ke doctor_name jika doctor_id tidak ada
+        //  METODE 2: Fallback ke doctor_name jika doctor_id tidak ada
         if (!$mySchedule) {
             $mySchedule = \App\Models\DoctorSchedule::where('doctor_name', $user->name)
                 ->where('is_active', true)
@@ -67,7 +67,7 @@
                 ->first();
         }
         
-        // ✅ METODE 3: Fallback ke day_of_week jika menggunakan kolom tunggal
+        //  METODE 3: Fallback ke day_of_week jika menggunakan kolom tunggal
         if (!$mySchedule) {
             $mySchedule = \App\Models\DoctorSchedule::where('doctor_name', $user->name)
                 ->where('is_active', true)
@@ -89,12 +89,12 @@
         
         $todayName = $dayNames[$today] ?? ucfirst($today);
         
-        // ✅ TAMBAH: Hitung statistik antrian dokter hari ini
+        //  TAMBAH: Hitung statistik antrian dokter hari ini
         $todayQueues = \App\Models\Queue::where('doctor_id', $user->id)
             ->whereDate('tanggal_antrian', today())
             ->get();
             
-        // ✅ FALLBACK: Jika tidak ada doctor_id, cari berdasarkan doctor_name
+        //  FALLBACK: Jika tidak ada doctor_id, cari berdasarkan doctor_name
         if ($todayQueues->isEmpty()) {
             $todayQueues = \App\Models\Queue::whereHas('doctorSchedule', function($query) use ($user) {
                 $query->where('doctor_name', $user->name);
@@ -108,7 +108,7 @@
         $completedCount = $todayQueues->where('status', 'completed')->count();
         $totalQueues = $todayQueues->count();
         
-        // ✅ TAMBAH: Hitung progress jadwal
+        //  TAMBAH: Hitung progress jadwal
         if ($mySchedule) {
             $currentTime = now();
             $startTime = $mySchedule->start_time;
@@ -126,7 +126,7 @@
         }
     @endphp
 
-    {{-- ✅ UPDATED: Tampilan Jadwal yang Lebih Informatif --}}
+    {{--  UPDATED: Tampilan Jadwal yang Lebih Informatif --}}
     @if($mySchedule)
         <div class="bg-green-50 border border-green-200 rounded-lg p-6 mb-4">
             <div class="flex items-center justify-between">
@@ -145,7 +145,7 @@
                     </div>
                 </div>
                 
-                {{-- ✅ TAMBAH: Statistik Antrian Hari Ini --}}
+                {{--  TAMBAH: Statistik Antrian Hari Ini --}}
                 <div class="text-right">
                     <div class="grid grid-cols-3 gap-4 text-center">
                         <div class="bg-yellow-100 rounded-lg p-3">
@@ -164,7 +164,7 @@
                 </div>
             </div>
             
-            {{-- ✅ TAMBAH: Progress Bar Jadwal --}}
+            {{--  TAMBAH: Progress Bar Jadwal --}}
             <div class="mt-4">
                 <div class="flex justify-between text-xs text-green-600 mb-2">
                     <span class="font-medium">
@@ -188,7 +188,7 @@
                 </div>
             </div>
             
-            {{-- ✅ TAMBAH: Quick Actions --}}
+            {{--  TAMBAH: Quick Actions --}}
             <div class="mt-4 flex justify-between items-center">
                 <div class="text-sm text-green-600">
                     <span class="font-medium">Total Antrian Hari Ini: {{ $totalQueues }}</span>
@@ -211,7 +211,7 @@
                     </div>
                 </div>
                 
-                {{-- ✅ TAMBAH: Info jika tidak ada jadwal --}}
+                {{--  TAMBAH: Info jika tidak ada jadwal --}}
                 <div class="text-right">
                     <div class="text-sm text-gray-500">
                         <span class="text-gray-400">Silakan hubungi admin untuk mengatur jadwal</span>
@@ -221,9 +221,9 @@
         </div>
     @endif
 
-    {{-- ✅ TAMBAH: Jadwal Minggu Ini (Preview) --}}
+    {{--  TAMBAH: Jadwal Minggu Ini (Preview) --}}
     @php
-        // ✅ CARI JADWAL DENGAN MULTIPLE FALLBACK
+        //  CARI JADWAL DENGAN MULTIPLE FALLBACK
         $weeklySchedules = \App\Models\DoctorSchedule::where('doctor_id', $user->id)
             ->where('is_active', true)
             ->with('service')
@@ -244,7 +244,7 @@
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 @foreach($weeklySchedules as $schedule)
                     @php
-                        // ✅ HANDLE MULTIPLE STRUKTUR DATABASE
+                        //  HANDLE MULTIPLE STRUKTUR DATABASE
                         $scheduleDays = [];
                         
                         // Jika ada kolom 'days' (array)

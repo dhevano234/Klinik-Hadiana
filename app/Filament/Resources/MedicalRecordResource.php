@@ -51,13 +51,13 @@ class MedicalRecordResource extends Resource
                     })
                     ->visible(fn () => request()->has('queue_number')),
 
-                // ✅ SECTION: Data Pasien - Grid 2 kolom
+                //  SECTION: Data Pasien - Grid 2 kolom
                 Forms\Components\Section::make('Data Periksa')
                     ->description('Pilih pasien untuk membuat rekam medis')
                     ->schema([
                         Forms\Components\Grid::make(2)
                             ->schema([
-                                // ✅ 1. Kolom Nama Pasien
+                                //  1. Kolom Nama Pasien
                                 Forms\Components\Select::make('user_id')
                                     ->label('Nama Pasien')
                                     ->options(function () {
@@ -68,11 +68,11 @@ class MedicalRecordResource extends Resource
                                     ->required()
                                     ->searchable()
                                     ->preload()
-                                    ->reactive() // ✅ REACTIVE untuk auto-fill
+                                    ->reactive() //  REACTIVE untuk auto-fill
                                     ->disabled(fn () => request()->has('user_id'))
                                     ->helperText('Pilih nama pasien dari daftar')
                                     ->afterStateUpdated(function ($state, callable $set) {
-                                        // ✅ AUTO-FILL nomor rekam medis
+                                        //  AUTO-FILL nomor rekam medis
                                         if ($state) {
                                             $user = User::find($state);
                                             if ($user && $user->medical_record_number) {
@@ -81,12 +81,12 @@ class MedicalRecordResource extends Resource
                                                 $set('display_medical_record_number', 'Belum ada nomor rekam medis');
                                             }
 
-                                            // ✅ AUTO-FILL KELUHAN dari antrian terbaru yang aktif
+                                            //  AUTO-FILL KELUHAN dari antrian terbaru yang aktif
                                             $latestComplaint = \App\Models\Queue::where('user_id', $state)
                                                 ->whereNotNull('chief_complaint')
                                                 ->where('chief_complaint', '!=', '')
-                                                ->whereIn('status', ['waiting', 'serving']) // ✅ Hanya antrian aktif
-                                                ->whereDate('created_at', today()) // ✅ Hanya hari ini
+                                                ->whereIn('status', ['waiting', 'serving']) //  Hanya antrian aktif
+                                                ->whereDate('created_at', today()) //  Hanya hari ini
                                                 ->latest('created_at')
                                                 ->first();
 
@@ -99,7 +99,7 @@ class MedicalRecordResource extends Resource
                                         }
                                     }),
 
-                                // ✅ 2. Kolom Nomor Rekam Medis (Display Only)
+                                //  2. Kolom Nomor Rekam Medis (Display Only)
                                 Forms\Components\TextInput::make('display_medical_record_number')
                                     ->label('Nomor Rekam Medis')
                                     ->disabled()
@@ -108,7 +108,7 @@ class MedicalRecordResource extends Resource
                                     ->helperText('Nomor rekam medis akan terisi otomatis')
                                     ->default(''),
 
-                                // ✅ DROPDOWN PILIH DOKTER - REVISI MINIMAL
+                                //  DROPDOWN PILIH DOKTER - REVISI MINIMAL
                                 Forms\Components\Select::make('doctor_id')
                                     ->label('Dokter yang Menangani')
                                     ->options(function () {
@@ -128,7 +128,7 @@ class MedicalRecordResource extends Resource
                     ])
                     ->collapsible(),
 
-                // ✅ SECTION: Data Pemeriksaan
+                //  SECTION: Data Pemeriksaan
                 Forms\Components\Section::make('Data Pemeriksaan')
                     ->description('Isi hasil pemeriksaan pasien')
                     ->schema([
@@ -141,18 +141,18 @@ class MedicalRecordResource extends Resource
                             ->columnSpanFull()
                             ->reactive()
                             ->afterStateHydrated(function ($component, $state, $record) {
-                                // ✅ AUTO-FILL dari antrian jika ada saat load form
+                                //  AUTO-FILL dari antrian jika ada saat load form
                                 if (!$state && !$record) { // Hanya saat create baru
                                     $userId = request()->get('user_id');
                                     $queueNumber = request()->get('queue_number');
                                     
                                     if ($userId) {
-                                        // ✅ Cari antrian terbaru user yang ada keluhan DAN masih aktif
+                                        //  Cari antrian terbaru user yang ada keluhan DAN masih aktif
                                         $queueWithComplaint = \App\Models\Queue::where('user_id', $userId)
                                             ->whereNotNull('chief_complaint')
                                             ->where('chief_complaint', '!=', '')
-                                            ->whereIn('status', ['waiting', 'serving']) // ✅ hanya antrian aktif
-                                            ->whereDate('created_at', today()) // ✅ hanya hari ini
+                                            ->whereIn('status', ['waiting', 'serving']) //  hanya antrian aktif
+                                            ->whereDate('created_at', today()) //  hanya hari ini
                                             ->latest('created_at')
                                             ->first();
                                         
@@ -176,7 +176,7 @@ class MedicalRecordResource extends Resource
                                 $queueNumber = request()->get('queue_number');
                                 
                                 if ($userId || $queueNumber) {
-                                    // ✅ Check apakah ada keluhan dari antrian yang aktif
+                                    //  Check apakah ada keluhan dari antrian yang aktif
                                     if ($userId) {
                                         $queue = \App\Models\Queue::where('user_id', $userId)
                                             ->whereNotNull('chief_complaint')
@@ -192,7 +192,7 @@ class MedicalRecordResource extends Resource
                                     }
                                     
                                     if ($queue && $queue->chief_complaint) {
-                                        return "✅ Keluhan diambil dari antrian #{$queue->number}: \"" . \Illuminate\Support\Str::limit($queue->chief_complaint, 80) . "\"";
+                                        return " Keluhan diambil dari antrian #{$queue->number}: \"" . \Illuminate\Support\Str::limit($queue->chief_complaint, 80) . "\"";
                                     } else {
                                         return "ℹ️ Pasien tidak mengisi keluhan saat ambil antrian. Silakan tanyakan langsung kepada pasien.";
                                     }
@@ -253,7 +253,7 @@ class MedicalRecordResource extends Resource
 
 
 
-                // ✅ HIDDEN FIELD SUDAH TIDAK DIPERLUKAN KARENA ADA DROPDOWN DOKTER
+                //  HIDDEN FIELD SUDAH TIDAK DIPERLUKAN KARENA ADA DROPDOWN DOKTER
                 // Forms\Components\Hidden::make('doctor_id')->default(Auth::id()),
             ]);
     }
@@ -262,7 +262,7 @@ class MedicalRecordResource extends Resource
     {
         return $table
             ->columns([
-                // ✅ Kolom Nomor Rekam Medis
+                //  Kolom Nomor Rekam Medis
                 Tables\Columns\TextColumn::make('user.medical_record_number')
                     ->label('No. RM')
                     ->searchable()
@@ -275,7 +275,7 @@ class MedicalRecordResource extends Resource
                     ->copyMessage('Nomor RM disalin!')
                     ->tooltip('Klik untuk copy nomor rekam medis'),
 
-                // ✅ Kolom nama pasien dengan info tambahan
+                //  Kolom nama pasien dengan info tambahan
                 Tables\Columns\TextColumn::make('user.name')
                     ->label('Nama Pasien')
                     ->searchable()
@@ -357,11 +357,6 @@ class MedicalRecordResource extends Resource
                         now()->endOfWeek()
                     ])),
 
-                Tables\Filters\Filter::make('has_medical_record')
-                    ->label('Punya No. RM')
-                    ->query(fn ($query) => $query->whereHas('user', function ($q) {
-                        $q->whereNotNull('medical_record_number');
-                    })),
             ])
             ->actions([
                 Tables\Actions\ActionGroup::make([
@@ -388,13 +383,13 @@ class MedicalRecordResource extends Resource
                         ->label('Hapus Terpilih')
                         ->requiresConfirmation(),
                         
-                    // ✅ HANYA BULK EXPORT - BISA PILIH SEMUA ATAU SEBAGIAN
+                    
                     Tables\Actions\BulkAction::make('export')
                         ->label('Export Data')
                         ->icon('heroicon-o-arrow-down-tray')
                         ->color('success')
                         ->action(function ($records) {
-                            // ✅ SIMPLE EXPORT LOGIC
+                            //  SIMPLE EXPORT LOGIC
                             $filename = 'rekam_medis_' . now()->format('Y-m-d_H-i-s') . '.csv';
                             
                             $headers = [
@@ -405,7 +400,7 @@ class MedicalRecordResource extends Resource
                             $callback = function() use ($records) {
                                 $file = fopen('php://output', 'w');
                                 
-                                // ✅ Add BOM for UTF-8
+                                //  Add BOM for UTF-8
                                 fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF));
                                 
                                 // Header CSV
@@ -447,7 +442,7 @@ class MedicalRecordResource extends Resource
                                 fclose($file);
                             };
 
-                            // ✅ Show success notification
+                            //  Show success notification
                             \Filament\Notifications\Notification::make()
                                 ->title('Export Berhasil')
                                 ->body('Data rekam medis berhasil diekspor ke file CSV')

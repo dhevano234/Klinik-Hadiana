@@ -27,7 +27,7 @@ class ListQueues extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            // ✅ TOMBOL PENDING SEMUA ANTRIAN (dengan auto-activate global pending)
+            //  TOMBOL PENDING SEMUA ANTRIAN (dengan auto-activate global pending)
             Actions\Action::make('pendingAllWaiting')
                 ->label('Pending Semua Antrian')
                 ->icon('heroicon-o-pause')
@@ -41,7 +41,7 @@ class ListQueues extends ListRecords
                     
                     if ($result['success']) {
                         Notification::make()
-                            ->title('✅ Berhasil Pending Semua Antrian!')
+                            ->title('Berhasil Pending Semua Antrian!')
                             ->body($result['message'] . ' Antrian baru akan otomatis pending.')
                             ->warning()
                             ->duration(8000)
@@ -55,7 +55,7 @@ class ListQueues extends ListRecords
                     }
                 }),
 
-            // ✅ TOMBOL RESUME SEMUA ANTRIAN (dengan auto-deactivate global pending)
+            //  TOMBOL RESUME SEMUA ANTRIAN (dengan auto-deactivate global pending)
             Actions\Action::make('resumeAllPending')
                 ->label('Resume Semua Antrian')
                 ->icon('heroicon-o-play')
@@ -69,7 +69,7 @@ class ListQueues extends ListRecords
                     
                     if ($result['success']) {
                         Notification::make()
-                            ->title('✅ Berhasil Resume Semua Antrian!')
+                            ->title('Berhasil Resume Semua Antrian!')
                             ->body($result['message'] . ' Antrian baru akan berjalan normal.')
                             ->success()
                             ->duration(8000)

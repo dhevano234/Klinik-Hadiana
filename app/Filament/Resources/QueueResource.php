@@ -1,5 +1,4 @@
 <?php
-// File: app/Filament/Resources/QueueResource.php (untuk admin) - UPDATED
 
 namespace App\Filament\Resources;
 
@@ -10,6 +9,7 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Notifications\Notification;
 
 class QueueResource extends Resource
 {
@@ -33,7 +33,7 @@ class QueueResource extends Resource
     
     public static function canDeleteAny(): bool
     {
-        return false;
+        return true;
     }
 
     public static function form(Form $form): Form
@@ -63,7 +63,6 @@ class QueueResource extends Resource
     {
         return $table
             ->columns([
-                // ✅ KOLOM NOMOR ANTRIAN
                 Tables\Columns\TextColumn::make('number')
                     ->label('Nomor Antrian')
                     ->searchable()
@@ -73,7 +72,6 @@ class QueueResource extends Resource
                     ->color('primary')
                     ->size('sm'),
 
-                // ✅ KOLOM LAYANAN/POLI
                 Tables\Columns\TextColumn::make('service.name')
                     ->label('Layanan')
                     ->searchable()
@@ -82,26 +80,17 @@ class QueueResource extends Resource
                     ->color('info')
                     ->limit(20),
 
-                // ✅ KOLOM NOMOR REKAM MEDIS - TAMBAHAN BARU
                 Tables\Columns\TextColumn::make('user.medical_record_number')
-                    ->label('No. Rekam Medis')
+                    ->label('No. RM')
                     ->searchable()
                     ->sortable()
-                    ->weight('semibold')
                     ->badge()
                     ->color('success')
-                    ->placeholder('Walk-in')
+                    ->placeholder('Belum ada')
                     ->copyable()
-                    ->copyMessage('Nomor RM disalin!')
-                    ->tooltip('Klik untuk copy nomor rekam medis')
-                    ->formatStateUsing(function ($state, Queue $record) {
-                        if ($record->user_id && $record->user) {
-                            return $record->user->medical_record_number ?? 'Belum ada';
-                        }
-                        return 'Walk-in';
-                    }),
+                    ->copyMessage('No. RM disalin!')
+                    ->tooltip('Klik untuk copy nomor rekam medis'),
 
-                // ✅ KOLOM NAMA PASIEN
                 Tables\Columns\TextColumn::make('user.name')
                     ->label('Nama Pasien')
                     ->default('Walk-in')
@@ -125,7 +114,6 @@ class QueueResource extends Resource
                         return 'Antrian tanpa akun terdaftar';
                     }),
 
-                // ✅ KOLOM NO HP
                 Tables\Columns\TextColumn::make('user.phone')
                     ->label('No. HP')
                     ->default('-')
@@ -140,7 +128,6 @@ class QueueResource extends Resource
                         return '-';
                     }),
 
-                // ✅ KOLOM STATUS
                 Tables\Columns\TextColumn::make('status')
                     ->label('Status')
                     ->badge()
@@ -166,43 +153,21 @@ class QueueResource extends Resource
                         default => 'heroicon-m-question-mark-circle',
                     }),
 
-                // ✅ KOLOM DOKTER (jika ada)
-                Tables\Columns\TextColumn::make('doctor_name')
+                Tables\Columns\TextColumn::make('doctor.name')
                     ->label('Dokter')
                     ->searchable()
                     ->badge()
                     ->color('purple')
                     ->placeholder('Belum ditentukan')
-                    ->toggleable()
-                    ->description(function (Queue $record): ?string {
-                        // Tampilkan sumber data dokter untuk debugging
-                        if (config('app.debug', false)) {
-                            if ($record->doctorSchedule) {
-                                return '✓ Dipilih saat antrian';
-                            } elseif ($record->medicalRecord && $record->medicalRecord->doctor) {
-                                return '↳ Dari rekam medis';
-                            }
-                        }
-                        return null;
-                    }),
+                    ->toggleable(),
 
-                // ✅ KOLOM LOKET
-                Tables\Columns\TextColumn::make('counter.name')
-                    ->label('Loket')
-                    ->badge()
-                    ->color('info')
-                    ->placeholder('Belum di-assign')
-                    ->toggleable(isToggledHiddenByDefault: true),
-
-                // ✅ KOLOM WAKTU DIBUAT
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Dibuat')
                     ->dateTime('d/m/Y H:i')
                     ->sortable()
                     ->since()
-                    ->tooltip(fn ($state) => $state->format('l, d F Y - H:i:s')),
+                    ->tooltip(fn ($state) => $state?->format('l, d F Y - H:i:s')),
 
-                // ✅ KOLOM TIMELINE (ADVANCED)
                 Tables\Columns\TextColumn::make('timeline_status')
                     ->label('Timeline')
                     ->toggleable(isToggledHiddenByDefault: true)
@@ -232,7 +197,6 @@ class QueueResource extends Resource
                     ->tooltip('Timeline: Dibuat → Dipanggil → Dilayani → Selesai'),
             ])
             ->filters([
-                // ✅ FILTER STATUS
                 Tables\Filters\SelectFilter::make('status')
                     ->label('Status')
                     ->options([
@@ -243,14 +207,12 @@ class QueueResource extends Resource
                     ])
                     ->multiple(),
 
-                // ✅ FILTER LAYANAN
                 Tables\Filters\SelectFilter::make('service')
                     ->label('Layanan')
                     ->relationship('service', 'name')
                     ->searchable()
                     ->preload(),
 
-                // ✅ FILTER WAKTU
                 Tables\Filters\Filter::make('created_at')
                     ->label('Hari Ini')
                     ->query(fn ($query) => $query->whereDate('created_at', today()))
@@ -262,25 +224,8 @@ class QueueResource extends Resource
                         now()->startOfWeek(),
                         now()->endOfWeek()
                     ])),
-
-                // ✅ FILTER BERDASARKAN USER
-                Tables\Filters\Filter::make('has_user')
-                    ->label('Memiliki Akun')
-                    ->query(fn ($query) => $query->whereNotNull('user_id')),
-
-                Tables\Filters\Filter::make('walk_in')
-                    ->label('Walk-in')
-                    ->query(fn ($query) => $query->whereNull('user_id')),
-
-                // ✅ FILTER BERDASARKAN NOMOR RM
-                Tables\Filters\Filter::make('has_medical_record')
-                    ->label('Punya No. RM')
-                    ->query(fn ($query) => $query->whereHas('user', function ($q) {
-                        $q->whereNotNull('medical_record_number');
-                    })),
             ])
             ->actions([
-                // ✅ ACTIONS YANG SESUAI UNTUK ADMIN
                 Tables\Actions\ActionGroup::make([
                     Tables\Actions\ViewAction::make()
                         ->label('Lihat Detail')
@@ -308,7 +253,6 @@ class QueueResource extends Resource
                             
                             $updateData = ['status' => $newStatus];
                             
-                            // Set timestamp sesuai status
                             switch ($newStatus) {
                                 case 'serving':
                                     $updateData['served_at'] = now();
@@ -323,39 +267,14 @@ class QueueResource extends Resource
                             
                             $record->update($updateData);
                             
-                            \Filament\Notifications\Notification::make()
+                            Notification::make()
                                 ->title('Status Berhasil Diubah')
                                 ->body("Antrian {$record->number}: {$oldStatus} → {$newStatus}")
                                 ->success()
                                 ->send();
                         })
                         ->successNotificationTitle('Status antrian berhasil diubah'),
-                        
-                    Tables\Actions\Action::make('assign_counter')
-                        ->label('Assign Loket')
-                        ->icon('heroicon-o-building-office')
-                        ->color('info')
-                        ->visible(fn (Queue $record) => !$record->counter_id)
-                        ->form([
-                            Forms\Components\Select::make('counter_id')
-                                ->label('Pilih Loket')
-                                ->relationship('counter', 'name')
-                                ->required()
-                                ->searchable()
-                                ->preload(),
-                        ])
-                        ->action(function (Queue $record, array $data) {
-                            $record->update($data);
-                            
-                            \Filament\Notifications\Notification::make()
-                                ->title('Loket Berhasil Di-assign')
-                                ->body("Antrian {$record->number} di-assign ke loket")
-                                ->success()
-                                ->send();
-                        })
-                        ->successNotificationTitle('Loket berhasil di-assign'),
 
-                    // ✅ ACTION UNTUK LIHAT/COPY NOMOR RM
                     Tables\Actions\Action::make('view_medical_record')
                         ->label('Lihat No. RM')
                         ->icon('heroicon-o-identification')
@@ -365,7 +284,7 @@ class QueueResource extends Resource
                             $user = $record->user;
                             $mrn = $user->medical_record_number ?? 'Belum ada';
                             
-                            \Filament\Notifications\Notification::make()
+                            Notification::make()
                                 ->title('Informasi Rekam Medis')
                                 ->body("Pasien: {$user->name}\nNo. RM: {$mrn}\nKTP: " . ($user->nomor_ktp ?? 'Belum ada'))
                                 ->success()
@@ -376,7 +295,15 @@ class QueueResource extends Resource
                     Tables\Actions\DeleteAction::make()
                         ->label('Hapus')
                         ->icon('heroicon-o-trash')
-                        ->requiresConfirmation(),
+                        ->requiresConfirmation()
+                        ->modalHeading('Hapus Antrian')
+                        ->modalDescription(fn (Queue $record) => "Apakah Anda yakin ingin menghapus antrian {$record->number}? Tindakan ini tidak dapat dibatalkan.")
+                        ->successNotification(
+                            Notification::make()
+                                ->success()
+                                ->title('Antrian dihapus')
+                                ->body('Antrian berhasil dihapus dari sistem.')
+                        ),
                 ])
                 ->label('Aksi')
                 ->icon('heroicon-m-ellipsis-vertical')
@@ -385,7 +312,6 @@ class QueueResource extends Resource
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    // ✅ BULK ACTIONS
                     Tables\Actions\BulkAction::make('mark_as_served')
                         ->label('Tandai Dilayani')
                         ->icon('heroicon-o-check-circle')
@@ -402,7 +328,7 @@ class QueueResource extends Resource
                                 }
                             });
                             
-                            \Filament\Notifications\Notification::make()
+                            Notification::make()
                                 ->title('Berhasil')
                                 ->body("{$updated} antrian ditandai sebagai sedang dilayani")
                                 ->success()
@@ -428,7 +354,7 @@ class QueueResource extends Resource
                                 }
                             });
                             
-                            \Filament\Notifications\Notification::make()
+                            Notification::make()
                                 ->title('Berhasil')
                                 ->body("{$updated} antrian ditandai sebagai selesai")
                                 ->success()
@@ -436,7 +362,6 @@ class QueueResource extends Resource
                         })
                         ->requiresConfirmation(),
 
-                    // ✅ BULK EXPORT DATA
                     Tables\Actions\BulkAction::make('export_selected')
                         ->label('Export Data')
                         ->icon('heroicon-o-arrow-down-tray')
@@ -445,14 +370,15 @@ class QueueResource extends Resource
                             $filename = 'antrian_export_' . now()->format('Y-m-d_H-i-s') . '.csv';
                             
                             $headers = [
-                                'Content-Type' => 'text/csv',
+                                'Content-Type' => 'text/csv; charset=UTF-8',
                                 'Content-Disposition' => 'attachment; filename="' . $filename . '"',
                             ];
 
                             $callback = function() use ($records) {
                                 $file = fopen('php://output', 'w');
                                 
-                                // Header CSV
+                                fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF));
+                                
                                 fputcsv($file, [
                                     'Nomor Antrian',
                                     'No. Rekam Medis',
@@ -467,14 +393,13 @@ class QueueResource extends Resource
                                     'Selesai'
                                 ]);
 
-                                // Data
                                 foreach ($records as $record) {
                                     fputcsv($file, [
-                                        $record->number,
-                                        $record->user?->medical_record_number ?? 'Walk-in',
-                                        $record->user?->name ?? 'Walk-in',
-                                        $record->user?->phone ?? '-',
-                                        $record->service?->name ?? '-',
+                                        $record->number ?? '-',
+                                        $record->user->medical_record_number ?? 'Walk-in',
+                                        $record->user->name ?? 'Walk-in',
+                                        $record->user->phone ?? '-',
+                                        $record->service->name ?? '-',
                                         match($record->status) {
                                             'waiting' => 'Menunggu',
                                             'serving' => 'Dilayani',
@@ -482,8 +407,8 @@ class QueueResource extends Resource
                                             'canceled' => 'Dibatalkan',
                                             default => $record->status,
                                         },
-                                        $record->doctor_name ?? '-',
-                                        $record->counter?->name ?? '-',
+                                        $record->doctor->name ?? '-',
+                                        $record->counter->name ?? '-',
                                         $record->created_at->format('d/m/Y H:i'),
                                         $record->called_at?->format('d/m/Y H:i') ?? '-',
                                         $record->finished_at?->format('d/m/Y H:i') ?? '-',
@@ -497,13 +422,22 @@ class QueueResource extends Resource
                         }),
 
                     Tables\Actions\DeleteBulkAction::make()
-                        ->label('Hapus Terpilih'),
+                        ->label('Hapus Terpilih')
+                        ->requiresConfirmation()
+                        ->modalHeading('Hapus Antrian')
+                        ->modalDescription('Apakah Anda yakin ingin menghapus antrian yang dipilih? Tindakan ini tidak dapat dibatalkan.')
+                        ->successNotification(
+                            Notification::make()
+                                ->success()
+                                ->title('Antrian dihapus')
+                                ->body('Antrian yang dipilih berhasil dihapus.')
+                        ),
                 ]),
             ])
             ->defaultSort('created_at', 'desc')
             ->striped()
             ->paginated([10, 25, 50, 100])
-            ->poll('5s') // Auto refresh setiap 5 detik
+            ->poll('5s')
             ->persistSearchInSession()
             ->persistColumnSearchesInSession()
             ->emptyStateHeading('Belum ada antrian')

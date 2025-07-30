@@ -1,5 +1,5 @@
 <?php
-// File: database/migrations/2025_06_29_add_medical_record_number_to_users_table.php
+
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;

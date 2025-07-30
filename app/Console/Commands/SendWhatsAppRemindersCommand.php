@@ -22,11 +22,10 @@ class SendWhatsAppRemindersCommand extends Command
         
         $this->info("🕐 Current time: {$now->format('Y-m-d H:i:s')}");
         
-        // ✅ UPDATED LOGIC: Cari antrian yang 10 menit lagi akan dipanggil
-        // Jika sekarang 02:07, cari antrian estimasi 02:16-02:18 (10±1 menit dari sekarang)
+        
         $tenMinutesFromNow = $now->copy()->addMinutes(10);
-        $toleranceStart = $tenMinutesFromNow->copy()->subMinutes(1); // 9 menit dari sekarang
-        $toleranceEnd = $tenMinutesFromNow->copy()->addMinutes(1);   // 11 menit dari sekarang
+        $toleranceStart = $tenMinutesFromNow->copy()->subMinutes(1); 
+        $toleranceEnd = $tenMinutesFromNow->copy()->addMinutes(1);   
         
         $this->info("🎯 Looking for queues with estimated call time between:");
         $this->info("   Start: {$toleranceStart->format('H:i:s')} (9 minutes from now)");
@@ -81,8 +80,8 @@ class SendWhatsAppRemindersCommand extends Command
                     // Update database bahwa reminder sudah dikirim
                     $queue->update(['whatsapp_reminder_sent_at' => $now]);
                     
-                    $this->info("✅ WhatsApp reminder sent for Queue {$queue->number} (10 minutes before estimated time)");
-                    Log::info("✅ WhatsApp reminder sent successfully", [
+                    $this->info(" WhatsApp reminder sent for Queue {$queue->number} (10 minutes before estimated time)");
+                    Log::info(" WhatsApp reminder sent successfully", [
                         'queue_id' => $queue->id,
                         'queue_number' => $queue->number,
                         'user_name' => $queue->user->name,
@@ -123,7 +122,7 @@ class SendWhatsAppRemindersCommand extends Command
         
         $this->info("========================================");
         $this->info("📊 SUMMARY:");
-        $this->info("✅ Sent: {$sent}");
+        $this->info(" Sent: {$sent}");
         $this->info("⚠️  Skipped: {$skipped}");
         $this->info("❌ Failed: {$failed}");
         $this->info("📱 Total processed: " . ($sent + $skipped + $failed));

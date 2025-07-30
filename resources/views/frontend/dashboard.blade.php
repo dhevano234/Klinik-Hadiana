@@ -4,19 +4,19 @@
 
 @section('content')
 <main class="main-content">
-    <!-- Welcome Card -->
+    
     <div class="welcome-card animate">
         <h1>Selamat Datang, {{ Auth::user()->name }}! </h1>
         <p>Monitoring Antrian Dengan Mudah</p>
     </div>
     
-    <!-- ✅ ANTRIAN AKTIF CARD dengan estimasi realtime (tidak berubah) -->
+    
     @if($antrianAktif)
     <div class="antrian-aktif-card animate" id="antrianAktifCard">
         <div class="card-header">
             <h5><i class="fas fa-clock" style="color: #f39c12;"></i> Antrian Aktif Anda</h5>
             <div class="status-badge status-{{ strtolower($antrianAktif->status) }}">
-                {{-- ✅ CHANGE 1: Badge status untuk pending --}}
+                
                 @if($antrianAktif->status === 'pending')
                     DI-PENDING
                 @else
@@ -84,9 +84,9 @@
     @else
     <div class="no-antrian-card animate">
         <div class="card-content">
-            <i class="fas fa-plus-circle" style="font-size: 3rem; color: #3498db; margin-bottom: 15px;"></i>
+            <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
             <h5>Belum Ada Antrian Aktif</h5>
-            <p>Buat Kunjungan baru untuk mulai mendapatkan layanan</p>
+            <p>Anda Belum Mempunyai Antrian Hari ini</p>
             <a href="/antrian/create" class="btn btn-primary">
                 <i class="fas fa-plus"></i> Buat Kunjungan
             </a>
@@ -94,22 +94,22 @@
     </div>
     @endif
     
-    <!-- ✅ SMART: Stats Row dengan layout dinamis -->
+    
     @php
-        $totalCards = 1; // Antrian Hari Ini
+        $totalCards = 1; 
         if(isset($quotaInfo['has_quotas']) && $quotaInfo['has_quotas']) {
-            $totalCards += min($quotaInfo['quotas']->count(), 2); // Max 2 dokter
+            $totalCards += min($quotaInfo['quotas']->count(), 2); 
             if($quotaInfo['quotas']->count() > 2) {
-                $totalCards += 1; // Card "Lihat Semua"
+                $totalCards += 1; 
             }
         } else {
-            $totalCards += 2; // 2 placeholder cards
+            $totalCards += 2; 
         }
         $gridClass = 'stats-' . $totalCards . '-cards';
     @endphp
     
     <div class="stats-row {{ $gridClass }}">
-        <!-- Total Antrian Hari Ini (tetap) -->
+        
         <div class="stat-card blue animate">
             <div class="stat-icon blue">
                 <i class="fas fa-clock"></i>
@@ -118,7 +118,7 @@
             <div class="stat-label">Antrian Hari Ini</div>
         </div>
         
-        <!-- ✅ SMART: Show max 2 doctors, sisanya di "Lihat Semua" -->
+        
         @if(isset($quotaInfo['has_quotas']) && $quotaInfo['has_quotas'])
             @foreach($quotaInfo['quotas']->take(2) as $quota)
             <div class="stat-card quota-card {{ $quota['status_color'] }} animate">
@@ -136,7 +136,7 @@
             </div>
             @endforeach
             
-            <!-- ✅ NEW: Jika lebih dari 2 dokter, tampilkan "Lihat Semua" button -->
+            
             @if($quotaInfo['quotas']->count() > 2)
             <div class="stat-card view-all-card animate" onclick="showAllDoctors()">
                 <div class="stat-icon info">
@@ -154,7 +154,7 @@
             @endif
             
         @else
-            <!-- Fallback jika tidak ada quota hari ini -->
+            
             <div class="stat-card gray animate">
                 <div class="stat-icon gray">
                     <i class="fas fa-calendar-times"></i>
@@ -166,7 +166,7 @@
                 </div>
             </div>
             
-            <!-- Placeholder untuk grid balance -->
+            
             <div class="stat-card gray animate">
                 <div class="stat-icon gray">
                     <i class="fas fa-info-circle"></i>
@@ -180,7 +180,7 @@
         @endif
     </div>
 
-    <!-- ✅ NEW: Modal untuk menampilkan semua dokter -->
+    
     @if(isset($quotaInfo['has_quotas']) && $quotaInfo['has_quotas'] && $quotaInfo['quotas']->count() > 2)
     <div id="doctorsModal" class="modal">
         <div class="modal-content">
@@ -216,7 +216,7 @@
 </main>
 
 <style>
-/* ✅ CSS Variables untuk warna */
+// CSS Variables untuk warna 
 :root {
     --color-success: #27ae60;
     --color-warning: #f39c12;
@@ -225,7 +225,7 @@
     --color-gray: #95a5a6;
 }
 
-/* ✅ STYLES untuk antrian aktif card */
+
 .antrian-aktif-card, .no-antrian-card {
     background: white;
     border-radius: 15px;
@@ -271,7 +271,7 @@
     color: #155724;
 }
 
-/* ✅ ADD 3: CSS untuk pending badge */
+
 .status-pending {
     background: #f8d7da;
     color: #721c24;
@@ -310,7 +310,7 @@
     color: #2c3e50;
 }
 
-/* ✅ STYLES untuk estimasi card */
+
 .estimasi-card, .serving-card {
     background: #f8f9fa;
     border-radius: 12px;
@@ -415,7 +415,7 @@
     transform: translateY(-2px);
 }
 
-/* ✅ SMART: Dynamic grid based on card count */
+
 .stats-row {
     display: grid;
     gap: 20px;
@@ -425,18 +425,18 @@
     margin-right: auto;
 }
 
-/* ✅ Grid untuk 2 cards (1 antrian + 1 dokter) */
+
 .stats-2-cards {
     grid-template-columns: repeat(2, 1fr);
-    max-width: 800px; /* Lebih sempit untuk 2 cards */
+    max-width: 800px; 
 }
 
-/* ✅ Grid untuk 3 cards (1 antrian + 2 dokter) */
+
 .stats-3-cards {
     grid-template-columns: repeat(3, 1fr);
 }
 
-/* ✅ Grid untuk 4 cards (1 antrian + 2 dokter + lihat semua) */
+
 .stats-4-cards {
     grid-template-columns: repeat(2, 1fr);
 }
@@ -447,7 +447,7 @@
     }
 }
 
-/* ✅ RESPONSIVE: Untuk tablet */
+// tablet
 @media (max-width: 768px) {
     .stats-row,
     .stats-2-cards,
@@ -459,7 +459,7 @@
     }
 }
 
-/* ✅ RESPONSIVE: Untuk mobile */
+//mobile
 @media (max-width: 480px) {
     .stats-row,
     .stats-2-cards,
@@ -504,7 +504,7 @@
     border-left: 4px solid var(--color-gray);
 }
 
-/* ✅ NEW: View All Doctors Card */
+
 .stat-card.view-all-card {
     cursor: pointer;
     border-left: 4px solid var(--color-info);
@@ -586,7 +586,7 @@
     transform: translateX(5px);
 }
 
-/* ✅ NEW: Modal Styles */
+
 .modal {
     display: none;
     position: fixed;
@@ -650,7 +650,7 @@
     padding: 25px;
 }
 
-/* ✅ NEW: Doctors Grid in Modal */
+
 .doctors-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -744,7 +744,7 @@
     transition: width 0.3s ease;
 }
 
-/* ✅ ANIMATIONS */
+
 @keyframes fadeIn {
     from { opacity: 0; }
     to { opacity: 1; }
@@ -786,7 +786,7 @@
     transition: opacity 0.3s ease;
 }
 
-/* ✅ RESPONSIVE untuk modal */
+
 @media (max-width: 768px) {
     .antrian-content {
         grid-template-columns: 1fr;
@@ -835,16 +835,16 @@
 }
 </style>
 
-<!-- ✅ NEW: JavaScript untuk Modal -->
+
 <script>
 function showAllDoctors() {
     document.getElementById('doctorsModal').style.display = 'block';
-    document.body.style.overflow = 'hidden'; // Prevent background scroll
+    document.body.style.overflow = 'hidden'; 
 }
 
 function closeDoctorsModal() {
     document.getElementById('doctorsModal').style.display = 'none';
-    document.body.style.overflow = 'auto'; // Restore scroll
+    document.body.style.overflow = 'auto'; 
 }
 
 // Close modal when clicking outside
@@ -855,11 +855,5 @@ window.onclick = function(event) {
     }
 }
 
-// Close modal with Escape key
-document.addEventListener('keydown', function(event) {
-    if (event.key === 'Escape') {
-        closeDoctorsModal();
-    }
-});
 </script>
 @endsection

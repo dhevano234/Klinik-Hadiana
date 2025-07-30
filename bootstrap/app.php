@@ -1,5 +1,5 @@
 <?php
-// File: bootstrap/app.php - Laravel 12 dengan Scheduler
+
 
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -13,7 +13,7 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withSchedule(function (Schedule $schedule) {
-        // ✅ LARAVEL 12: Define scheduler di bootstrap
+        
         $schedule->command('whatsapp:send-reminders')
                  ->everyMinute()
                  ->withoutOverlapping()

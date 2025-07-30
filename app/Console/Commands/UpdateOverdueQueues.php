@@ -38,26 +38,26 @@ class UpdateOverdueQueues extends Command
         
         $this->info("🕐 Checking for overdue queues on {$targetDate->format('Y-m-d')}...");
         
-        // ✅ NEW: Cari antrian overdue berdasarkan session dan non-session
+        //  NEW: Cari antrian overdue berdasarkan session dan non-session
         $overdueQueues = Queue::where('status', 'waiting')
             ->whereDate('tanggal_antrian', $targetDate)
             ->where('estimated_call_time', '<', now())
             ->get();
 
         if ($overdueQueues->isEmpty()) {
-            $this->info('✅ No overdue queues found');
+            $this->info(' No overdue queues found');
             return 0;
         }
 
         $this->info("🔍 Found {$overdueQueues->count()} overdue queues on {$targetDate->format('d F Y')}");
 
-        // ✅ NEW: Group by session type
+        //  NEW: Group by session type
         $sessionBasedQueues = $overdueQueues->where('doctor_id', '!=', null);
         $nonSessionQueues = $overdueQueues->where('doctor_id', null);
 
         $updatedCount = 0;
 
-        // ✅ UPDATE: Session-based queues (per dokter)
+        //  UPDATE: Session-based queues (per dokter)
         if ($sessionBasedQueues->isNotEmpty()) {
             $this->info("📋 Processing session-based queues...");
             
@@ -72,11 +72,11 @@ class UpdateOverdueQueues extends Command
                 $sessionUpdated = $this->updateDoctorSession($doctorId, $targetDate, $queues);
                 $updatedCount += $sessionUpdated;
                 
-                $this->line("     ✅ Updated {$sessionUpdated} queues");
+                $this->line("      Updated {$sessionUpdated} queues");
             }
         }
 
-        // ✅ UPDATE: Non-session queues (sistem lama)
+        //  UPDATE: Non-session queues (sistem lama)
         if ($nonSessionQueues->isNotEmpty()) {
             $this->info("📋 Processing non-session queues...");
             
@@ -92,21 +92,21 @@ class UpdateOverdueQueues extends Command
                 $updatedCount++;
             }
             
-            $this->line("  ✅ Updated {$nonSessionQueues->count()} non-session queues");
+            $this->line("   Updated {$nonSessionQueues->count()} non-session queues");
         }
 
         if ($updatedCount > 0) {
-            $this->info("✅ Total updated: {$updatedCount} queues on {$targetDate->format('d F Y')}");
+            $this->info(" Total updated: {$updatedCount} queues on {$targetDate->format('d F Y')}");
             $this->showDetailedBreakdown($targetDate);
         } else {
-            $this->warn("⚠️ No queues were updated on {$targetDate->format('d F Y')}");
+            $this->warn(" No queues were updated on {$targetDate->format('d F Y')}");
         }
         
         return 0;
     }
 
     /**
-     * ✅ NEW: Update session dokter tertentu
+     *  NEW: Update session dokter tertentu
      */
     private function updateDoctorSession($doctorId, $targetDate, $sessionQueues)
     {
@@ -152,12 +152,12 @@ class UpdateOverdueQueues extends Command
     }
 
     /**
-     * ✅ UPDATED: Show detailed breakdown dengan session info
+     *  UPDATED: Show detailed breakdown dengan session info
      */
     private function showDetailedBreakdown($targetDate): void
     {
         $this->newLine();
-        $this->info("📊 Detailed Breakdown for {$targetDate->format('d F Y')}:");
+        $this->info(" Detailed Breakdown for {$targetDate->format('d F Y')}:");
         
         // Session-based breakdown
         $sessionBreakdown = Queue::with(['doctorSchedule', 'service'])
@@ -182,7 +182,7 @@ class UpdateOverdueQueues extends Command
             });
 
         if ($sessionBreakdown->isNotEmpty()) {
-            $this->line("🏥 Session-based Queues:");
+            $this->line(" Session-based Queues:");
             $headers = ['Doctor', 'Service', 'Session Time', 'Total', 'Avg Delay', 'Max Delay', 'Overdue'];
             $rows = [];
             
@@ -208,7 +208,7 @@ class UpdateOverdueQueues extends Command
             ->count();
 
         if ($nonSessionCount > 0) {
-            $this->line("📋 Non-session Queues: {$nonSessionCount} queues");
+            $this->line(" Non-session Queues: {$nonSessionCount} queues");
         }
     }
 }

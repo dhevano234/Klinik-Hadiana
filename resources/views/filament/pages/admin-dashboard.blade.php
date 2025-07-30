@@ -1,5 +1,3 @@
-{{-- File: resources/views/filament/pages/admin-dashboard.blade.php --}}
-{{-- FIXED: Single root element untuk Livewire --}}
 
 <x-filament-panels::page>
 <div class="space-y-6">
@@ -43,7 +41,7 @@
     {{-- Main Navigation Cards - Grid dengan Patient Management --}}
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {{-- Data Pasien --}}
-        <a href="{{ url('/admin/patient-management') }}" 
+        <a href="{{ url('admin/patient-managements') }}" 
            class="block bg-white rounded-lg shadow border hover:shadow-md transition-shadow">
             <div class="p-6">
                 <div class="flex items-center">

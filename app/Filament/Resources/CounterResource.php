@@ -151,21 +151,21 @@ class CounterResource extends Resource
                     ->size('sm')
                     ->button()
                     ->visible(function(Counter $record) {
-                        // ✅ PERUBAHAN UTAMA: Cek antrian hari ini saja
+                        //  PERUBAHAN UTAMA: Cek antrian hari ini saja
                         if (!$record->is_active) {
                             return false;
                         }
                         
                         $hasQueueToday = \App\Models\Queue::where('status', 'waiting')
                             ->where('service_id', $record->service_id)
-                            ->whereDate('tanggal_antrian', today()) // ✅ HANYA HARI INI
+                            ->whereDate('tanggal_antrian', today()) //  HANYA HARI INI
                             ->exists();
                             
                         return $hasQueueToday;
                     })
                     ->action(function (Counter $record, $livewire) {
                         try {
-                            // ✅ VALIDASI TAMBAHAN: Pastikan ada antrian hari ini
+                            //  VALIDASI TAMBAHAN: Pastikan ada antrian hari ini
                             $hasQueueToday = \App\Models\Queue::where('status', 'waiting')
                                 ->where('service_id', $record->service_id)
                                 ->whereDate('tanggal_antrian', today())
@@ -220,13 +220,13 @@ class CounterResource extends Resource
                                 
                                 // Try multiple methods to ensure audio plays
                                 if (window.handleQueueCall) {
-                                    console.log('✅ Using handleQueueCall function');
+                                    console.log(' Using handleQueueCall function');
                                     window.handleQueueCall('$message');
                                 } else if (window.QueueAudio && window.QueueAudio.speak) {
-                                    console.log('✅ Using QueueAudio.speak');
+                                    console.log(' Using QueueAudio.speak');
                                     window.QueueAudio.speak('$message');
                                 } else if (window.playQueueAudio) {
-                                    console.log('✅ Using playQueueAudio function');
+                                    console.log(' Using playQueueAudio function');
                                     window.playQueueAudio('$message');
                                 } else {
                                     console.log('⚠️ Using direct speechSynthesis fallback');
@@ -237,7 +237,7 @@ class CounterResource extends Resource
                                         utterance.rate = 0.9;
                                         utterance.volume = 1.0;
                                         speechSynthesis.speak(utterance);
-                                        console.log('✅ Direct speechSynthesis executed');
+                                        console.log(' Direct speechSynthesis executed');
                                     } else {
                                         console.error('❌ speechSynthesis not available');
                                     }
@@ -256,7 +256,7 @@ class CounterResource extends Resource
                     ->requiresConfirmation()
                     ->modalHeading('Panggil Antrian Berikutnya')
                     ->modalDescription(function(Counter $record) {
-                        // ✅ PERUBAHAN: Tambah info pembatasan hari ini
+                        //  PERUBAHAN: Tambah info pembatasan hari ini
                         $todayDate = today()->format('d F Y');
                         return "Panggil antrian berikutnya untuk {$record->name}? Hanya antrian tanggal {$todayDate} yang akan dipanggil. Audio akan diputar secara otomatis.";
                     })
@@ -277,7 +277,7 @@ class CounterResource extends Resource
                             app(QueueService::class)->serveQueue($record->activeQueue);
                             
                             Notification::make()
-                                ->title("✅ Antrian {$record->activeQueue->number} mulai dilayani")
+                                ->title(" Antrian {$record->activeQueue->number} mulai dilayani")
                                 ->body("Status diubah menjadi 'Sedang Dilayani'")
                                 ->success()
                                 ->duration(5000)
@@ -396,7 +396,7 @@ class CounterResource extends Resource
                             $messages = [];
                             
                             foreach ($records as $record) {
-                                // ✅ PERUBAHAN: Cek antrian hari ini dulu
+                                //  PERUBAHAN: Cek antrian hari ini dulu
                                 $hasQueueToday = \App\Models\Queue::where('status', 'waiting')
                                     ->where('service_id', $record->service_id)
                                     ->whereDate('tanggal_antrian', today())
@@ -483,7 +483,7 @@ class CounterResource extends Resource
                             }
                             
                             Notification::make()
-                                ->title("✅ {$activated} loket berhasil diaktifkan")
+                                ->title(" {$activated} loket berhasil diaktifkan")
                                 ->success()
                                 ->send();
                         }),

@@ -486,30 +486,30 @@ body {
        </ul>
    </div>
    
-   <!-- Spacer untuk mendorong ke bawah -->
+   <!-- di space dorong bawah -->
    <div style="flex-grow: 1;"></div>
    
-   <!-- Buku Panduan di paling bawah -->
+   
    <div class="nav-section" style="margin-bottom: 0; padding-top: 20px; border-top: 1px solid #ecf0f1;">
        <ul class="nav-menu">
            <li class="nav-item">
                <a href="/panduan-user" class="nav-link">
                    <i class="fas fa-book-open"></i>
-                   Buku Panduan
+                   User Guide
                </a>
            </li>
        </ul>
    </div>
 </aside>
 
-<!-- HAPUS SIDEBAR OVERLAY - TIDAK PERLU -->
+
 
 <script>
 function toggleSidebar() {
    const sidebar = document.getElementById('sidebar');
    sidebar.classList.toggle('open');
    
-   // HAPUS SEMUA KODE OVERLAY - TIDAK PERLU
+   
 }
 
 function toggleDropdown(event) {

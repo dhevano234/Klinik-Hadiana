@@ -476,12 +476,10 @@ class Queue extends Model
         return $this->estimated_call_time->setTimezone('Asia/Jakarta')->format('H:i');
     }
 
-    /**
-     * ✅ UPDATED: Check apakah antrian sudah terlambat dari estimasi dengan pending support
-     */
+    
     public function getIsOverdueAttribute(): bool
     {
-        // ✅ PENDING LOGIC: Pending queues are not overdue
+        
         if ($this->status === 'pending') {
             return false;
         }
@@ -491,7 +489,7 @@ class Queue extends Model
         }
 
         if (!$this->estimated_call_time) {
-            // FALLBACK: Hitung berdasarkan session atau created_at + estimasi
+            // hitung berdasarkn dibuat kapan + estimasi
             $estimasiMenit = $this->estimasi_tunggu;
             
             if ($this->doctor_id && $this->doctorSchedule) {
@@ -507,20 +505,15 @@ class Queue extends Model
         return $this->estimated_call_time < now();
     }
 
-    // ✅ UPDATED: HELPER METHODS dengan pending support
-    public function canEdit(): bool
-    {
-        return in_array($this->status, ['waiting', 'pending']); // ✅ TAMBAH PENDING
-    }
 
     public function canCancel(): bool
     {
-        return in_array($this->status, ['waiting', 'pending']); // ✅ TAMBAH PENDING
+        return in_array($this->status, ['waiting', 'pending']); 
     }
 
     public function canPrint(): bool
     {
-        return in_array($this->status, ['waiting', 'pending', 'serving', 'finished']); // ✅ TAMBAH PENDING
+        return in_array($this->status, ['waiting', 'pending', 'serving', 'finished']); 
     }
 
     public function isCompleted(): bool
@@ -533,19 +526,19 @@ class Queue extends Model
         return in_array($this->status, ['waiting', 'pending', 'serving']); // ✅ TAMBAH PENDING
     }
 
-    // ✅ UPDATED: Can be pending
+    // pending
     public function canBePending(): bool
     {
         return $this->status === 'waiting';
     }
 
-    // ✅ NEW: Can be resumed
+    // resume
     public function canBeResumed(): bool
     {
         return $this->status === 'pending';
     }
 
-    // ✅ SCOPE METHODS - FIXED untuk tanggal_antrian dan session dengan pending support
+    // tambah scope biar gausah ulang2 query
     public function scopeToday($query)
     {
         return $query->whereDate('tanggal_antrian', today());
@@ -593,7 +586,7 @@ class Queue extends Model
         });
     }
 
-    // ✅ SCOPES untuk estimasi waktu dengan pending support
+    
     public function scopeOverdue($query)
     {
         return $query->where('status', 'waiting')
@@ -606,13 +599,13 @@ class Queue extends Model
                     ->where('estimated_call_time', '>=', now());
     }
 
-    // ✅ NEW: Scope untuk pending queues
+    
     public function scopePending($query)
     {
         return $query->where('status', 'pending');
     }
 
-    // ✅ NEW SCOPES untuk tanggal_antrian dan session
+    
     public function scopeForDate($query, $date)
     {
         return $query->whereDate('tanggal_antrian', $date);
@@ -629,18 +622,14 @@ class Queue extends Model
         return $query->whereDate('tanggal_antrian', today());
     }
 
-    /**
-     * ✅ NEW: Scope untuk filter berdasarkan session dokter
-     */
+    
     public function scopeInDoctorSession($query, $doctorId, $tanggalAntrian)
     {
         return $query->where('doctor_id', $doctorId)
                      ->whereDate('tanggal_antrian', $tanggalAntrian);
     }
 
-    /**
-     * ✅ NEW: Scope untuk antrian dalam session yang sama
-     */
+    
     public function scopeSameSession($query, $doctorId, $tanggalAntrian)
     {
         return $query->where('doctor_id', $doctorId)
@@ -648,17 +637,13 @@ class Queue extends Model
                      ->where('status', 'waiting');
     }
 
-    /**
-     * ✅ NEW: Scope untuk non-session queues (backward compatibility)
-     */
+    
     public function scopeNonSession($query)
     {
         return $query->whereNull('doctor_id');
     }
 
-    /**
-     * ✅ NEW: Scope untuk session-based queues
-     */
+    
     public function scopeSessionBased($query)
     {
         return $query->whereNotNull('doctor_id');

@@ -1,6 +1,5 @@
 <?php
-// File: app/Providers/Filament/AdminPanelProvider.php
-// FINAL: AdminPanelProvider dengan Branding, Patient Management, dan DailyQuota Integration
+
 
 namespace App\Providers\Filament;
 
@@ -27,11 +26,11 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login()
-            ->authGuard('admin') // ✅ Set guard admin
+            ->authGuard('admin') //  Set guard admin
             ->colors([
                 'primary' => Color::Amber,
             ])
-            // ✅ BRANDING - GANTI NAMA ATAU LOGO DI SINI
+            //  BRANDING - GANTI NAMA ATAU LOGO DI SINI
             ->brandName('Klinik Pratama Hadiana Sehat') // ⬅️ Tampilkan tulisan
             // ->brandLogo(asset('assets/img/logo/logoklinikpratama.png')) // ⬅️ (Opsional) Ganti ke logo gambar
 
@@ -41,9 +40,9 @@ class AdminPanelProvider extends PanelProvider
                 \App\Filament\Pages\AdminDashboard::class,
             ])
             ->resources([
-                // ✅ REGISTER RESOURCES: Urutan sesuai prioritas di dashboard
+                //  REGISTER RESOURCES: Urutan sesuai prioritas di dashboard
                 \App\Filament\Resources\PatientManagementResource::class,  // Data Pasien
-                \App\Filament\Resources\WeeklyQuotaResource::class,         // ✅ NEW: Kuota Antrian
+                \App\Filament\Resources\WeeklyQuotaResource::class,         //  NEW: Kuota Antrian
                 \App\Filament\Resources\CounterResource::class,            // Kelola Loket
                 \App\Filament\Resources\QueueResource::class,              // Antrian
                 \App\Filament\Resources\DoctorScheduleResource::class,     // Jadwal Dokter
@@ -70,6 +69,6 @@ class AdminPanelProvider extends PanelProvider
                 Authenticate::class,
                 \App\Http\Middleware\EnsureAdminRole::class,
             ])
-            ->spa(); // ✅ OPTIONAL: Enable SPA mode untuk better performance
+            ->spa(); //  OPTIONAL: Enable SPA mode untuk better performance
     }
 }

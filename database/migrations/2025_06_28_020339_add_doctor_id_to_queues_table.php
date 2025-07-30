@@ -1,5 +1,5 @@
 <?php
-// File: database/migrations/2025_XX_XX_add_doctor_id_to_queues_table.php
+
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;

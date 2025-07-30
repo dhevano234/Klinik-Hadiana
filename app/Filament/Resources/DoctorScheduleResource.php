@@ -34,7 +34,7 @@ class DoctorScheduleResource extends Resource
     {
         return $form
             ->schema([
-                // ✅ SECTION 1: FOTO DOKTER
+                //  SECTION 1: FOTO DOKTER
                 Forms\Components\Section::make('Foto Dokter')
                     ->description('Upload foto profil dokter untuk ditampilkan di jadwal')
                     ->schema([
@@ -61,13 +61,13 @@ class DoctorScheduleResource extends Resource
                     ->columns(1)
                     ->collapsible(),
 
-                // ✅ SECTION 2: INFORMASI DOKTER (UPDATED)
+                //  SECTION 2: INFORMASI DOKTER (UPDATED)
                 Forms\Components\Section::make('Informasi Dokter')
                     ->description('Data dokter dan poli praktik')
                     ->schema([
                         Forms\Components\Grid::make(2)
                             ->schema([
-                                // ✅ DROPDOWN: Pilih dokter dari database users (role: dokter)
+                                //  DROPDOWN: Pilih dokter dari database users (role: dokter)
                                 Forms\Components\Select::make('doctor_id')
                                     ->label('Pilih Dokter')
                                     ->required()
@@ -145,7 +145,7 @@ class DoctorScheduleResource extends Resource
                                         ]);
                                         
                                         Notification::make()
-                                            ->title('✅ Dokter Baru Berhasil Dibuat')
+                                            ->title(' Dokter Baru Berhasil Dibuat')
                                             ->body("Akun dokter {$data['name']} telah dibuat dengan email {$data['email']}")
                                             ->success()
                                             ->send();
@@ -153,7 +153,7 @@ class DoctorScheduleResource extends Resource
                                         return $doctor->id;
                                     }),
 
-                                // ✅ HIDDEN: Field doctor_name untuk backward compatibility
+                                //  HIDDEN: Field doctor_name untuk backward compatibility
                                 Forms\Components\Hidden::make('doctor_name'),
                                     
                                 Forms\Components\Select::make('service_id')
@@ -188,7 +188,7 @@ class DoctorScheduleResource extends Resource
                             ]),
                     ]),
 
-                // ✅ SECTION 3: JADWAL PRAKTIK
+                //  SECTION 3: JADWAL PRAKTIK
                 Forms\Components\Section::make('Jadwal Praktik')
                     ->description('Atur hari dan jam praktik dokter')
                     ->schema([
@@ -244,7 +244,7 @@ class DoctorScheduleResource extends Resource
     {
         return $table
             ->columns([
-                // ✅ KOLOM FOTO
+                //  KOLOM FOTO
                 Tables\Columns\ImageColumn::make('foto')
                     ->label('Foto')
                     ->circular()
@@ -253,7 +253,7 @@ class DoctorScheduleResource extends Resource
                     ->extraAttributes(['style' => 'object-fit: cover;'])
                     ->toggleable(),
 
-                // ✅ KOLOM NAMA DOKTER (dari relationship atau fallback)
+                //  KOLOM NAMA DOKTER (dari relationship atau fallback)
                 Tables\Columns\TextColumn::make('doctor_name')
                     ->label('Nama Dokter')
                     ->searchable()

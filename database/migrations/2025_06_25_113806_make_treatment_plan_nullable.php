@@ -1,5 +1,5 @@
 <?php
-// File: database/migrations/2025_06_25_make_treatment_plan_nullable.php
+
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;

@@ -144,7 +144,7 @@
             animation: fadeIn 0.5s ease-out;
         }
 
-        /* ✅ Styling khusus untuk keluhan di tiket print */
+        /*  Styling khusus untuk keluhan di tiket print */
         .complaint-row {
             border-top: 2px solid #007bff !important;
             margin-top: 8px !important;
@@ -254,7 +254,7 @@
                 </span>
             </div>
 
-            {{-- ✅ TAMBAH INFO KELUHAN JIKA ADA --}}
+            {{--  TAMBAH INFO KELUHAN JIKA ADA --}}
             @if(!empty($antrian->chief_complaint))
             <div class="info-row complaint-row">
                 <span class="info-label">Keluhan:</span>

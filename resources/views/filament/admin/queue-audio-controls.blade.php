@@ -80,7 +80,7 @@
         
         try {
             if (!window.QueueAudio) {
-                console.error('❌ QueueAudio not available');
+                console.error(' QueueAudio not available');
                 throw new Error('QueueAudio not loaded');
             }
             
@@ -100,7 +100,7 @@
                     }, 500);
                 }
                 
-                console.log('✅ Admin audio initialization successful');
+                console.log(' Admin audio initialization successful');
                 
                 // Test audio with admin-specific message
                 setTimeout(() => {
@@ -108,7 +108,7 @@
                 }, 1000);
                 
             } else {
-                console.error('❌ Admin audio initialization failed');
+                console.error(' Admin audio initialization failed');
                 alert('Gagal mengaktifkan audio. Pastikan browser mendukung Text-to-Speech.');
                 
                 if (button) {
@@ -117,7 +117,7 @@
                 }
             }
         } catch (error) {
-            console.error('❌ Admin audio initialization error:', error);
+            console.error(' Admin audio initialization error:', error);
             alert('Error: ' + error.message);
             
             if (button) {
@@ -139,15 +139,15 @@
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 text-xs">
                     <div>
                         <strong class="text-blue-600">Audio Status:</strong><br>
-                        Admin Init: ${adminAudioInitialized ? '✅ Yes' : '❌ No'}<br>
-                        Global Init: ${status.audioInitialized ? '✅ Yes' : '❌ No'}<br>
+                        Admin Init: ${adminAudioInitialized ? ' Yes' : ' No'}<br>
+                        Global Init: ${status.audioInitialized ? ' Yes' : ' No'}<br>
                         Currently Playing: ${status.isPlaying ? '🔊 Yes' : '🔇 No'}
                     </div>
                     <div>
                         <strong class="text-green-600">Speech API:</strong><br>
-                        Available: ${status.speechSynthesisSupported ? '✅ Yes' : '❌ No'}<br>
-                        Speaking: ${speechStatus?.speaking ? '✅ Yes' : '❌ No'}<br>
-                        Pending: ${speechStatus?.pending ? '⏳ Yes' : '✅ No'}
+                        Available: ${status.speechSynthesisSupported ? ' Yes' : ' No'}<br>
+                        Speaking: ${speechStatus?.speaking ? ' Yes' : ' No'}<br>
+                        Pending: ${speechStatus?.pending ? '⏳ Yes' : ' No'}
                     </div>
                     <div>
                         <strong class="text-purple-600">Last Activity:</strong><br>
@@ -158,7 +158,7 @@
             `;
         } else {
             if (statusDiv) {
-                statusDiv.innerHTML = '<span class="text-red-600">❌ QueueAudio not available</span>';
+                statusDiv.innerHTML = '<span class="text-red-600"> QueueAudio not available</span>';
             }
         }
     }
@@ -211,7 +211,7 @@
                         await initializeAdminAudio();
                     }
                 } catch (error) {
-                    console.log('⚠️ Admin - Auto-initialization skipped:', error);
+                    console.log(' Admin - Auto-initialization skipped:', error);
                 }
             }
         }, 3000);
@@ -244,15 +244,15 @@
     // Global admin audio check
     setTimeout(() => {
         if (window.QueueAudio) {
-            console.log('✅ QueueAudio available in admin panel');
+            console.log(' QueueAudio available in admin panel');
         } else {
-            console.error('❌ QueueAudio not available in admin panel');
+            console.error(' QueueAudio not available in admin panel');
         }
         
         if ('speechSynthesis' in window) {
-            console.log('✅ Speech Synthesis API available in admin panel');
+            console.log(' Speech Synthesis API available in admin panel');
         } else {
-            console.warn('⚠️ Speech Synthesis API not supported in admin panel');
+            console.warn(' Speech Synthesis API not supported in admin panel');
         }
     }, 2000);
     </script>

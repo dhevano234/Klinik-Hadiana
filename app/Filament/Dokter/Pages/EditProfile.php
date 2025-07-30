@@ -1,6 +1,5 @@
 <?php
-// File: app/Filament/Dokter/Pages/EditProfile.php
-// Version: Final - Solusi terbaik untuk error
+
 
 namespace App\Filament\Dokter\Pages;
 
@@ -95,10 +94,10 @@ class EditProfile extends Page implements Forms\Contracts\HasForms
                                 'regex' => 'Password harus mengandung huruf besar, angka, dan simbol khusus.',
                             ])
                             ->helperText('
-                                ✅ Minimal 8 karakter
-                                ✅ Huruf kapital (A-Z)  
-                                ✅ Angka (0-9)
-                                ✅ Karakter spesial (!@#$%^&*_)
+                                 Minimal 8 karakter
+                                 Huruf kapital (A-Z)  
+                                 Angka (0-9)
+                                 Karakter spesial (!@#$%^&*_)
                             ')
                             ->columnSpanFull(),
 

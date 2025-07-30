@@ -1,6 +1,5 @@
 <?php
-// File: app/Filament/Pages/AdminDashboard.php
-// Simple Dashboard Component untuk Admin Panel
+
 
 namespace App\Filament\Pages;
 
