@@ -74,7 +74,7 @@ class DoctorManagementResource extends Resource
                                          Angka (0-9)
                                          Karakter spesial (!@#$%^&*_)
                                         
-                                        💡 Kosongkan jika tidak ingin mengubah password
+                                         Kosongkan jika tidak ingin mengubah password
                                     ')
                                     ->validationMessages([
                                         'min' => 'Password minimal 8 karakter.',
