@@ -5,39 +5,6 @@
 
     RewriteEngine On
 
-    # ===========================================
-    # SECURITY PROTECTION - Cloud Metadata Block
-    # ===========================================
-    
-    # Block access to cloud metadata endpoints
-    RewriteRule ^(latest|meta-data|user-data)(/.*)?$ - [F,L]
-    
-    # Block requests with suspicious Host headers targeting metadata IP
-    RewriteCond %{HTTP_HOST} ^169\.254\.169\.254$ [NC]
-    RewriteRule .* - [F,L]
-    
-    # Validate Host header - only allow your domain
-    RewriteCond %{HTTP_HOST} !^(klinikhadianaSehat\.site|www\.klinikhadianaSehat\.site|localhost)$ [NC]
-    RewriteCond %{HTTP_HOST} !^$
-    RewriteRule .* - [F,L]
-
-    # ===========================================
-    # ADDITIONAL SECURITY HEADERS
-    # ===========================================
-    
-    # Prevent access to sensitive files
-    RewriteRule ^\.env$ - [F,L]
-    RewriteRule ^\.git - [F,L]
-    RewriteRule ^composer\.(json|lock)$ - [F,L]
-    RewriteRule ^package(-lock)?\.json$ - [F,L]
-    
-    # Block access to specific Laravel directories
-    RewriteRule ^(app|bootstrap|config|database|resources|routes|storage|tests)/.*$ - [F,L]
-
-    # ===========================================
-    # LARAVEL DEFAULT CONFIGURATIONS
-    # ===========================================
-
     # Handle Authorization Header
     RewriteCond %{HTTP:Authorization} .
     RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
@@ -56,46 +23,3 @@
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^ index.php [L]
 </IfModule>
-
-# ===========================================
-# SECURITY HEADERS (if mod_headers is enabled)
-# ===========================================
-<IfModule mod_headers.c>
-    # Prevent clickjacking
-    Header always set X-Frame-Options "SAMEORIGIN"
-    
-    # Prevent MIME type sniffing
-    Header always set X-Content-Type-Options "nosniff"
-    
-    # Enable XSS filtering
-    Header always set X-XSS-Protection "1; mode=block"
-    
-    # Strict transport security (HTTPS)
-    Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
-    
-    # Referrer policy
-    Header always set Referrer-Policy "strict-origin-when-cross-origin"
-    
-    # Remove server signature
-    Header unset Server
-    Header unset X-Powered-By
-</IfModule>
-
-# ===========================================
-# ADDITIONAL PROTECTIONS
-# ===========================================
-
-# Disable server signature
-ServerTokens Prod
-
-# Prevent access to backup and temporary files
-<FilesMatch "\.(bak|backup|swp|tmp|temp)$">
-    Require all denied
-</FilesMatch>
-
-# Prevent execution of PHP files in uploads directory
-<Directory "*/storage/app/public/*">
-    <FilesMatch "\.php$">
-        Require all denied
-    </FilesMatch>
-</Directory>
