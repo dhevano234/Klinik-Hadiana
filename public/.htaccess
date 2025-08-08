@@ -5,6 +5,17 @@
 
     RewriteEngine On
 
+    # ===========================================
+    # BASIC SECURITY - Cloud Metadata Block
+    # ===========================================
+    
+    # Block access to cloud metadata endpoints (UTAMA untuk mengatasi vulnerability)
+    RewriteRule ^(latest|meta-data|user-data)(/.*)?$ - [F,L]
+
+    # ===========================================
+    # LARAVEL DEFAULT CONFIGURATIONS
+    # ===========================================
+
     # Handle Authorization Header
     RewriteCond %{HTTP:Authorization} .
     RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
@@ -22,4 +33,15 @@
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^ index.php [L]
+</IfModule>
+
+# ===========================================
+# BASIC SECURITY HEADERS (Optional - hanya jika mod_headers aktif)
+# ===========================================
+<IfModule mod_headers.c>
+    # Prevent clickjacking
+    Header always set X-Frame-Options "SAMEORIGIN"
+    
+    # Prevent MIME type sniffing  
+    Header always set X-Content-Type-Options "nosniff"
 </IfModule>
