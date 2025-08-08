@@ -1,0 +1,87 @@
+{
+    "name": "marcogermani87/filament-captcha",
+    "description": "Easy Captcha image integrations for Filament",
+    "keywords": [
+        "marcogermani87",
+        "laravel",
+        "filament",
+        "captcha",
+        "php"
+    ],
+    "homepage": "https://github.com/marcogermani87/filament-captcha",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Marco Germani",
+            "email": "info@marcogermani.it",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": "^8.1",
+        "ext-gd": "*",
+        "filament/filament": "^3.0",
+        "spatie/laravel-package-tools": "^1.16",
+        "illuminate/contracts": "^10.0||^11.0|^12.0",
+        "gregwar/captcha": "^1.2"
+    },
+    "require-dev": {
+        "laravel/pint": "^1.0",
+        "nunomaduro/collision": "^7.9|^8.0",
+        "orchestra/testbench": "^8.0|^9.0|^10.0",
+        "pestphp/pest": "^2.0|^3.7",
+        "pestphp/pest-plugin-arch": "^2.0|^3.0",
+        "pestphp/pest-plugin-laravel": "^2.0|^3.1",
+        "pestphp/pest-plugin-livewire": "^2.1|^3.0",
+        "larastan/larastan": "^2.0|^3.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "MarcoGermani87\\FilamentCaptcha\\": "src/",
+            "MarcoGermani87\\FilamentCaptcha\\Database\\Factories\\": "database/factories/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "MarcoGermani87\\FilamentCaptcha\\Tests\\": "tests/",
+            "Workbench\\App\\": "workbench/app/"
+        }
+    },
+    "scripts": {
+        "post-autoload-dump": "@composer run prepare",
+        "clear": "@php vendor/bin/testbench package:purge-filament-captcha --ansi",
+        "prepare": "@php vendor/bin/testbench package:discover --ansi",
+        "build": [
+            "@composer run prepare",
+            "@php vendor/bin/testbench workbench:build --ansi"
+        ],
+        "start": [
+            "Composer\\Config::disableProcessTimeout",
+            "@composer run build",
+            "@php vendor/bin/testbench serve"
+        ],
+        "analyse": "vendor/bin/phpstan analyse",
+        "test": "vendor/bin/pest",
+        "test-coverage": "vendor/bin/pest --coverage",
+        "format": "vendor/bin/pint"
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "pestphp/pest-plugin": true,
+            "phpstan/extension-installer": true
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "MarcoGermani87\\FilamentCaptcha\\FilamentCaptchaServiceProvider"
+            ],
+            "aliases": {
+                "FilamentCaptcha": "MarcoGermani87\\FilamentCaptcha\\Facades\\FilamentCaptcha"
+            }
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}

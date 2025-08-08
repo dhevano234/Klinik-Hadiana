@@ -341,6 +341,47 @@
             outline: 2px solid #007bff;
             outline-offset: 2px;
         }
+
+        /* === CAPTCHA STYLES - MINIMAL ADDITION === */
+        .captcha-container {
+            margin-bottom: 1rem;
+        }
+        
+        .captcha-display {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            background-color: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            margin-bottom: 0.75rem;
+        }
+        
+        .captcha-refresh-btn {
+            background: #6c757d;
+            border: none;
+            border-radius: 8px;
+            color: white;
+            padding: 0.5rem 0.75rem;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .captcha-refresh-btn:hover {
+            background: #5a6268;
+            transform: rotate(180deg);
+        }
+        
+        #captcha-image {
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            max-width: 150px;
+        }
     </style>
 </head>
 <body>
@@ -415,7 +456,32 @@
                 @enderror
             </div>
 
-
+            <!-- === CAPTCHA FIELD - ADDED === -->
+            <div class="captcha-container">
+                <label for="captcha" class="form-label">Verifikasi</label>
+                <div class="captcha-display">
+                    <img id="captcha-image" 
+                         src="{{ route('captcha.generate') }}" 
+                         alt="Captcha">
+                    <button type="button" 
+                            class="captcha-refresh-btn" 
+                            onclick="refreshCaptcha()" 
+                            title="Refresh Captcha">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                </div>
+                <input type="text" 
+                       class="form-control @error('captcha') is-invalid @enderror" 
+                       name="captcha" 
+                       id="captcha"
+                       placeholder="Masukkan kode di atas"
+                       maxlength="5"
+                       autocomplete="off"
+                       required>
+                @error('captcha')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+            </div>
 
             <!-- Login Button -->
             <button type="submit" class="btn btn-primary" id="loginBtn">
@@ -463,6 +529,11 @@
             }
         });
     });
+
+    // === CAPTCHA REFRESH FUNCTION - ADDED ===
+    function refreshCaptcha() {
+        document.getElementById('captcha-image').src = '{{ route("captcha.refresh") }}?' + Math.random();
+    }
 
     // Form submission with loading state
     document.getElementById('loginForm').addEventListener('submit', function() {

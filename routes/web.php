@@ -11,6 +11,11 @@ use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\ProfileController;
 use App\Services\SessionManager;
+use App\Http\Controllers\CaptchaController;
+
+// Captcha routes
+Route::get('/captcha', [CaptchaController::class, 'generate'])->name('captcha.generate');
+Route::get('/captcha/refresh', [CaptchaController::class, 'refresh'])->name('captcha.refresh');
 
 // Halaman Utama
 Route::get('/', fn () => view('welcome'))->name('welcome');

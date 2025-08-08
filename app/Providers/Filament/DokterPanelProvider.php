@@ -1,6 +1,5 @@
 <?php
 
-
 namespace App\Providers\Filament;
 
 use Filament\Http\Middleware\Authenticate;
@@ -17,6 +16,7 @@ use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use App\Filament\Dokter\Pages\Auth\Login; // Import custom login page
 
 class DokterPanelProvider extends PanelProvider
 {
@@ -28,16 +28,18 @@ class DokterPanelProvider extends PanelProvider
             ->colors([
                 'primary' => Color::Green,
             ])
-            ->login()
+            // Use custom login page instead of default login()
+            ->login(\App\Filament\Dokter\Pages\Auth\Login::class)
             ->authGuard('dokter')
             ->brandName('Klinik Pratama Hadiana Sehat')
+            // Register the captcha plugin
+            ->plugin(\MarcoGermani87\FilamentCaptcha\FilamentCaptcha::make())
             ->discoverResources(in: app_path('Filament/Dokter/Resources'), for: 'App\\Filament\\Dokter\\Resources')
             ->discoverPages(in: app_path('Filament/Dokter/Pages'), for: 'App\\Filament\\Dokter\\Pages')
             ->pages([
                 \App\Filament\Dokter\Pages\Dashboard::class,
                 \App\Filament\Dokter\Pages\EditProfile::class,
             ])
-            // ✅ Tambahkan user menu items
             ->userMenuItems([
                 MenuItem::make()
                     ->label('Edit Profile')

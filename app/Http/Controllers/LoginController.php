@@ -1,12 +1,11 @@
 <?php
-// app/Http/Controllers/LoginController.php
 
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\RateLimiter;
 use App\Services\SessionManager;
 
 class LoginController extends Controller
@@ -18,18 +17,46 @@ class LoginController extends Controller
 
     public function login(Request $request)
     {
+        // Manual rate limiting
+        $key = 'patient_login_attempts:' . $request->ip();
+        $maxAttempts = 5;
+        $decayMinutes = 1;
+
+        if (RateLimiter::tooManyAttempts($key, $maxAttempts)) {
+            $seconds = RateLimiter::availableIn($key);
+            
+            return redirect()->back()
+                ->withErrors(['email' => 'Terlalu banyak percobaan. Silakan coba lagi dalam ' . ceil($seconds / 60) . ' menit.'])
+                ->withInput();
+        }
+
         $validator = Validator::make($request->all(), [
             'email' => 'required|email',
             'password' => 'required',
+            'captcha' => 'required|string|max:5',
         ], [
             'email.required' => 'Email harus diisi',
             'email.email' => 'Format email tidak valid',
             'password.required' => 'Password harus diisi',
+            'captcha.required' => 'Captcha harus diisi',
         ]);
 
         if ($validator->fails()) {
+            // Hit rate limiter on validation failure
+            RateLimiter::hit($key, $decayMinutes * 60);
+            
             return redirect()->back()
                 ->withErrors($validator)
+                ->withInput();
+        }
+
+        // Validate captcha first
+        if (!$this->validateCaptcha($request->input('captcha'))) {
+            // Hit rate limiter on failed captcha
+            RateLimiter::hit($key, $decayMinutes * 60);
+            
+            return redirect()->back()
+                ->withErrors(['captcha' => 'Captcha tidak valid.'])
                 ->withInput();
         }
 
@@ -43,13 +70,34 @@ class LoginController extends Controller
             // Logout dari web guard (temporary login untuk validasi)
             Auth::guard('web')->logout();
             
+            // Clear rate limiter on successful login
+            RateLimiter::clear($key);
+            
             // Redirect berdasarkan role ke guard yang sesuai
             return $this->redirectUserByRole($user, $remember);
         }
 
+        // Hit rate limiter on failed login
+        RateLimiter::hit($key, $decayMinutes * 60);
+
         return redirect()->back()
             ->withErrors(['email' => 'Email atau password salah.'])
             ->withInput();
+    }
+
+    protected function validateCaptcha(string $input): bool
+    {
+        // Get the captcha from session and compare
+        $sessionCaptcha = session('captcha_text');
+        
+        if (!$sessionCaptcha) {
+            return false;
+        }
+
+        // Remove captcha from session after validation
+        session()->forget('captcha_text');
+
+        return strtolower(trim($input)) === strtolower(trim($sessionCaptcha));
     }
 
     private function redirectUserByRole($user, bool $remember = false)
@@ -91,7 +139,7 @@ class LoginController extends Controller
             return redirect('/')->with('success', 'Logout berhasil dari semua panel');
             
         } catch (\Exception $e) {
-            logger('SessionManager loginToGuard error: ' . $e->getMessage());
+            logger('SessionManager logout error: ' . $e->getMessage());
             return redirect('/')->with('error', 'Terjadi kesalahan saat logout');
         }
     }
