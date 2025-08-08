@@ -6,11 +6,33 @@
     RewriteEngine On
 
     # ===========================================
-    # BASIC SECURITY - Cloud Metadata Block
+    # SECURITY PROTECTION - Cloud Metadata Block
     # ===========================================
     
-    # Block access to cloud metadata endpoints (UTAMA untuk mengatasi vulnerability)
+    # Block access to cloud metadata endpoints
     RewriteRule ^(latest|meta-data|user-data)(/.*)?$ - [F,L]
+    
+    # Block requests with suspicious Host headers targeting metadata IP
+    RewriteCond %{HTTP_HOST} ^169\.254\.169\.254$ [NC]
+    RewriteRule .* - [F,L]
+    
+    # Validate Host header - only allow your domain
+    RewriteCond %{HTTP_HOST} !^(klinikhadianasehat\.site|www\.klinikhadianasehat\.site|localhost)$ [NC]
+    RewriteCond %{HTTP_HOST} !^$
+    RewriteRule .* - [F,L]
+
+    # ===========================================
+    # ADDITIONAL SECURITY BLOCKS
+    # ===========================================
+    
+    # Prevent access to sensitive files
+    RewriteRule ^\.env$ - [F,L]
+    RewriteRule ^\.git - [F,L]
+    RewriteRule ^composer\.(json|lock)$ - [F,L]
+    RewriteRule ^package(-lock)?\.json$ - [F,L]
+    
+    # Block access to specific Laravel directories
+    RewriteRule ^(app|bootstrap|config|database|resources|routes|storage|tests)/.*$ - [F,L]
 
     # ===========================================
     # LARAVEL DEFAULT CONFIGURATIONS
@@ -36,12 +58,38 @@
 </IfModule>
 
 # ===========================================
-# BASIC SECURITY HEADERS (Optional - hanya jika mod_headers aktif)
+# SECURITY HEADERS (if mod_headers is enabled)
 # ===========================================
 <IfModule mod_headers.c>
     # Prevent clickjacking
     Header always set X-Frame-Options "SAMEORIGIN"
     
-    # Prevent MIME type sniffing  
+    # Prevent MIME type sniffing
     Header always set X-Content-Type-Options "nosniff"
+    
+    # Enable XSS filtering
+    Header always set X-XSS-Protection "1; mode=block"
+    
+    # Referrer policy
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+    
+    # Remove server signature
+    Header unset Server
+    Header unset X-Powered-By
 </IfModule>
+
+# ===========================================
+# FILE ACCESS RESTRICTIONS
+# ===========================================
+
+# Prevent access to backup and temporary files
+<FilesMatch "\.(bak|backup|swp|tmp|temp|log)$">
+    Order deny,allow
+    Deny from all
+</FilesMatch>
+
+# Prevent access to .env and other config files
+<FilesMatch "^\.env">
+    Order deny,allow
+    Deny from all
+</FilesMatch>
